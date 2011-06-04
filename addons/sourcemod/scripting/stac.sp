@@ -397,7 +397,15 @@ public Native_GetSetting(Handle:plugin, numParams)
 
 public Native_RegisterPunishment(Handle:plugin, numParams)
 {
+	decl String:sName[32];
+	GetNativeString(1, sName, sizeof(sName));
 	
+	new iPunishment = FindStringInArray(g_hPunishments, sName);
+	if(iPunishment == -1)
+		iPunishment = PushArrayString(g_hPunishments, sName);
+	
+	g_fPunishmentCallbacks[iPunishment]	= Function:GetNativeCell(2);
+	g_hPunishmentPlugins[iPunishment]	= plugin;
 }
 
 public Native_SetInfo(Handle:plugin, numParams)
