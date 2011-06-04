@@ -215,7 +215,7 @@ public OnPluginStart()
 	g_hKillKarma		=	CreateConVar("stac_kill_karma",			"1",	"STAC Kill Karma",													FCVAR_PLUGIN);
 	g_hKillLimit		=	CreateConVar("stac_kill_limit",			"3",	"STAC Kill Limit",													FCVAR_PLUGIN);
 	g_hLogDays			=	CreateConVar("stac_log_days",			"0",	"STAC Log Days [0 = Infinite]",										FCVAR_PLUGIN);
-	g_hPurgeTime		=	CreateConVar("stac_purge_time", 		"1800", "STAC Time in seconds player data should be kept before purging. [DEFAULT: 30 minutes]", FCVAR_PLUGIN);
+	g_hPurgeTime		=	CreateConVar("stac_purge_time", 		"30",	"STAC Time in minutes player data should be kept before purging.",	FCVAR_PLUGIN);
 	g_hSpawnPunishDelay	=	CreateConVar("stac_spawnpunish_delay",	"6",	"STAC Spawn Punish Delay",											FCVAR_PLUGIN);
 	//	Hook convar changes
 	HookConVarChange(g_hAttackLimit,		ConVarChange_ConVars);
@@ -328,7 +328,7 @@ public OnClientCookiesCached(client)
 	SortIntegers(iStorageTimes,5,Sort_Descending);
 	
 	new iTimeDifference = iCurrentTime - iStorageTimes[0];
-	if(iTimeDifference > GetConVarFloat(g_hPurgeTime))
+	if(iTimeDifference > (GetConVarFloat(g_hPurgeTime) * 60))
 		ResetClientPrefs(client);
 }
 
