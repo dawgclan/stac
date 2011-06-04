@@ -103,9 +103,15 @@ BuildLogFilePath()
 #if _DEBUG
 		LogDebug(false, "BuildLogFilePath - Log file has been rotated.");
 #endif
+<<<<<<< Updated upstream
 		if (g_hLogDays != INVALID_HANDLE)
 		{
 			if (GetConVarInt(g_hLogDays) > 0)
+=======
+		if (hCvarLogDays != INVALID_HANDLE)
+		{
+			if (GetConVarInt(hCvarLogDays) > 0)
+>>>>>>> Stashed changes
 			{
 #if _DEBUG
 				LogDebug(false, "BuildLogFilePath - Purging old log files.");
@@ -147,7 +153,11 @@ PurgeOldLogs()
 #if _DEBUG
 						LogDebug(false, "PurgeOldLogs - Checking file: %s", buffer);
 #endif
+<<<<<<< Updated upstream
 						if ( GetFileTime(file, FileTime_LastChange) < (GetTime() - (60 * 60 * 24 * GetConVarInt(g_hLogDays)) + 30) )
+=======
+						if ( GetFileTime(file, FileTime_LastChange) < (GetTime() - (60 * 60 * 24 * GetConVarInt(hCvarLogDays)) + 30) )
+>>>>>>> Stashed changes
 						{
 							// Log file is old
 #if _DEBUG
