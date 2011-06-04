@@ -1,0 +1,128 @@
+"Phrases"
+{
+	"Attacks"
+	{
+		"#format"	"{1:N},{2:i},{3:i}"
+		"en"		"{1} has {2}/{3} team attacks."
+		"de"		"{1} machte schon {2}/{3} Teamattacken."
+		"fr"		"{1} en est {2}/{3} TKs."
+	}
+	"Attacks Count"
+	{
+		"#format"	"{1:i},{2:i}"
+		"en"		"You have {1}/{2} team attacks."
+		"de"		"Du hast schon {1}/{2} Teamattacken gemacht."
+		"fr"		"Vous en tes  {1}/{2} tirs sur vos coequipiers."
+	}
+	"Ban Reason"
+	{
+		"en"		"Too many team kills."
+	}
+	"Bans Count"
+	{
+		"#format"	"{1:i},{2:i}"
+		"en"		"You have been banned {1}/{2} times."
+	}
+	"Do Not Forgive"
+	{
+		"en"		"Do not forgive"
+		"de"		"Nicht vergeben"
+		"fr"		"Punir"
+	}
+	"Earned Karma"
+	{
+		"#format"	"{1:i},{2:i}"
+		"en"		"You have earned {1}/{2} karma for"
+	}
+	"Forgive"
+	{
+		"en"		"Forgive"
+		"de"		"Vergeben"
+		"fr"		"Pardonner"
+	}
+	"Forgiven"
+	{
+		"#format"	"{1:N},{2:N}"
+		"en"		"{1} has forgiven {2} for team killing."
+		"de"		"{1} vergab {2} (Teamkill)."
+		"fr"		"{1} a pardonn {2} pour son TK."
+	}
+	"Karma Count"
+	{
+		"#format"	"{1:i},{2:i}"
+		"en"		"You have {1}/{2} karma."
+	}
+	"Karma Help 1"
+	{
+		"en"		"Earn karma by achieving goals."
+	}
+	"Karma Help 2"
+	{
+		"#format"	"{1:i}"
+		"en"		"Get to {1} karma to reduce your team kills by 1."
+	}
+	"Karma Help 3"
+	{
+		"#format"	"{1:i}"
+		"en"		"Your karma: {1}"
+	}
+	"Karma Help Title"
+	{
+		"en"		"Karma Help"
+	}
+	"Kicks Count"
+	{
+		"#format"	"{1:i},{2:i}"
+		"en"		"You have been kicked {1}/{2} times."
+		"de"		"Du wurdest {1}/{2} Mal gekickt"
+		"fr"		"Vous avez et expuls(e) {1}/{2} priodes."
+	}
+	"Killing Enemy"
+	{
+		"en"		"killing an enemy."
+	}
+	"Not Forgiven"
+	{
+		"#format"	"{1:N},{2:i},{3:i}"
+		"en"		"{1} has not been forgiven and now has {2}/{3} team kills."
+		"de"		"{1} wurde nicht vergeben und hat nun {2}/{3} Teamkills."
+		"fr"		"{1} n'a pas t pardonn(e) et en est  {2}/{3} TKs."
+	}
+	"Now Have Kills"
+	{
+		"#format"	"{1:i},{2:i}"
+		"en"		"You now have {1}/{2} team kills."
+	}
+	"Kills"
+	{
+		"#format"	"{1:N},{2:i},{3:i}"
+		"en"		"{1} has {2}/{3} team kills."
+		"de"		"{1} machte schon {2}/{3} Teamkills."
+		"fr"		"{1} en est {2}/{3} TKs."
+	}
+	"Kills Count"
+	{
+		"#format"	"{1:i},{2:i}"
+		"en"		"You have {1}/{2} team kills."
+		"de"		"Du hast schon {1}/{2} Teamkills gemacht."
+		"fr"		"Vous en tes  {1}/{2} TKs."
+	}
+	"TK Status Title"
+	{
+		"#format"	"{1:N}"
+		"en"		"{1}'s STAC Status."
+	}
+	"You Were Kicked"
+	{
+		"en"		"You have been kicked for too many TKs."
+		"de"		"Du wurdest wegen zu vieler Teamkills gekickt."
+		"fr"		"Vous avez t expuls(e) pour trop de TKs."
+	}
+	"You Were Killed"
+	{
+		"#format"	"{1:N}"
+		"en"		"You have been team killed by {1}."
+		"de"		"{1} hat Dich getoetet - Teamkill!"
+		"fr"		"Vous avez t tu(e) par {1}."
+	}
+}
