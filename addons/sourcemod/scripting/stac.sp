@@ -214,7 +214,7 @@ public OnClientCookiesCached(client)
 	new iTwoWeeks = 86400 * 14;
 	new iTimeDifference = iCurrentTime - iStorageTimes[0];
 	if(iTwoWeeks > iTimeDifference)
-		CreateClientPrefs(client);
+		ResetClientPrefs(client);
 }
 
 public ConVarChange_ConVars(Handle:convar, const String:oldValue[], const String:newValue[])
