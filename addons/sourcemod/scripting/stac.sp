@@ -43,7 +43,7 @@ new bool:g_bEnabled;
 new bool:g_bIgnoreBots;
 new bool:g_bImmunity;
 new bool:g_bKarmaEnabled;
-new Function:g_PunishmentCallbacks[64];
+new Function:g_fPunishmentCallbacks[64];
 // clientpref handles
 new Handle:g_hAttacks;
 new Handle:g_hBans;
@@ -52,11 +52,11 @@ new Handle:g_hKicks;
 new Handle:g_hKills;
 // cvar handles
 new Handle:g_hAttackLimit;
+new Handle:g_hAutoUpdate;
 new Handle:g_hBanLimit;
 new Handle:g_hBanTime;
 new Handle:g_hBanType;
 new Handle:g_hEnabled;
-new Handle:g_hAutoUpdate;
 new Handle:g_hIgnoreBots;
 new Handle:g_hImmunity;
 new Handle:g_hKarmaEnabled;
@@ -81,37 +81,26 @@ public APLRes:AskPluginLoad2(Handle:myself, bool:late,String:error[],err_max)
 	CreateNative("STAC_Setinfo",			Native_SetInfo);
 	
 	return APLRes_Success;
-}
-
-public OnAllPluginsLoaded()
-{
-#if defined _autoupdate_included
-	if (LibraryExists("pluginautoupdate"))
-	{
-		AutoUpdate_AddPlugin("stac.dawgclan.net", "/update.xml", STAC_VERSION);
-	}
-#endif
-}
+}	
  
 public OnPluginStart()
 {
 	//	Create Convars
 	CreateConVar("stac_version",STAC_VERSION,STAC_NAME,FCVAR_DONTRECORD|FCVAR_NOTIFY|FCVAR_PLUGIN);
-	g_hAttackLimit		=	CreateConVar("stac_attack_limit",		"10",	"STAC Attack Limit",		FCVAR_PLUGIN);
-	g_hBanLimit			=	CreateConVar("stac_ban_limit",			"3",	"STAC Ban Limit",			FCVAR_PLUGIN);
-	g_hBanTime			=	CreateConVar("stac_ban_time",			"60",	"STAC Ban Time",			FCVAR_PLUGIN);
-	g_hBanType			=	CreateConVar("stac_ban_type",			"0",	"STAC Ban Type",			FCVAR_PLUGIN);
-	g_hEnabled			=	CreateConVar("stac_enabled",			"1",	"STAC Enabled",				FCVAR_PLUGIN);
-	g_hAutoUpdate		=	CreateConVar("stac_autoupdate",			"1",	"STAC Automatic Updating (Requires SourceMod Autoupdate plugin)", FCVAR_PLUGIN);
-	g_hIgnoreBots		=	CreateConVar("stac_ignore_bots",		"1",	"STAC Ignore Bots",			FCVAR_PLUGIN);
-	g_hImmunity			=	CreateConVar("stac_immunity",			"0",	"STAC Immunity",			FCVAR_PLUGIN);
-	g_hKarmaEnabled		=	CreateConVar("stac_karma_enabled",		"1",	"STAC Karma Enabled",		FCVAR_PLUGIN);
-	g_hKarmaLimit		=	CreateConVar("stac_karma_limit",		"5",	"STAC Karma Limit",			FCVAR_PLUGIN);
-	g_hKickLimit		=	CreateConVar("stac_kick_limit",			"3",	"STAC Kick Limit",			FCVAR_PLUGIN);
-	g_hKillKarma		=	CreateConVar("stac_kill_karma",			"1",	"STAC Kill Karma",			FCVAR_PLUGIN);
-	g_hKillLimit		=	CreateConVar("stac_kill_limit",			"3",	"STAC Kill Limit",			FCVAR_PLUGIN);
-	g_hSpawnPunishDelay	=	CreateConVar("stac_spawnpunish_delay",	"6",	"STAC Spawn Punish Delay",	FCVAR_PLUGIN);
-	
+	g_hAttackLimit		=	CreateConVar("stac_attack_limit",		"10",	"STAC Attack Limit",												FCVAR_PLUGIN);
+	g_hAutoUpdate		=	CreateConVar("stac_autoupdate",			"1",	"STAC Automatic Updating (Requires SourceMod Autoupdate plugin)",	FCVAR_PLUGIN);
+	g_hBanLimit			=	CreateConVar("stac_ban_limit",			"3",	"STAC Ban Limit",													FCVAR_PLUGIN);
+	g_hBanTime			=	CreateConVar("stac_ban_time",			"60",	"STAC Ban Time",													FCVAR_PLUGIN);
+	g_hBanType			=	CreateConVar("stac_ban_type",			"0",	"STAC Ban Type",													FCVAR_PLUGIN);
+	g_hEnabled			=	CreateConVar("stac_enabled",			"1",	"STAC Enabled",														FCVAR_PLUGIN);
+	g_hIgnoreBots		=	CreateConVar("stac_ignore_bots",		"1",	"STAC Ignore Bots",													FCVAR_PLUGIN);
+	g_hImmunity			=	CreateConVar("stac_immunity",			"0",	"STAC Immunity",													FCVAR_PLUGIN);
+	g_hKarmaEnabled		=	CreateConVar("stac_karma_enabled",		"1",	"STAC Karma Enabled",												FCVAR_PLUGIN);
+	g_hKarmaLimit		=	CreateConVar("stac_karma_limit",		"5",	"STAC Karma Limit",													FCVAR_PLUGIN);
+	g_hKickLimit		=	CreateConVar("stac_kick_limit",			"3",	"STAC Kick Limit",													FCVAR_PLUGIN);
+	g_hKillKarma		=	CreateConVar("stac_kill_karma",			"1",	"STAC Kill Karma",													FCVAR_PLUGIN);
+	g_hKillLimit		=	CreateConVar("stac_kill_limit",			"3",	"STAC Kill Limit",													FCVAR_PLUGIN);
+	g_hSpawnPunishDelay	=	CreateConVar("stac_spawnpunish_delay",	"6",	"STAC Spawn Punish Delay",											FCVAR_PLUGIN);
 	//	Hook convar changes
 	HookConVarChange(g_hAttackLimit,		ConVarChange_ConVars);
 	HookConVarChange(g_hBanLimit,			ConVarChange_ConVars);
@@ -169,16 +158,6 @@ public OnPluginStart()
 	
 }
 
-public OnPluginEnd()
-{
-#if defined _autoupdate_included
-	if (LibraryExists("pluginautoupdate"))
-	{
-		AutoUpdate_RemovePlugin();
-	}
-#endif
-}
-
 public OnMapStart()
 {
 	if (GetConVarBool(g_hAutoUpdate))
@@ -191,15 +170,8 @@ public OnMapStart()
 #endif
 	}
 
-
 	GetTeams(g_iMod == Mod_Insurgency);
 	
-	// Make sure client has STAC client prefs
-	for(new i = 1; i <= MaxClients; i++)
-	{
-		if(IsClientInGame(i) && AreClientCookiesCached(i) == false)
-			CreateClientPrefs(i);
-	}
 }
 
 public OnConfigsExecuted()
@@ -209,12 +181,30 @@ public OnConfigsExecuted()
 	g_bImmunity			=	GetConVarBool(g_hImmunity);
 	g_bKarmaEnabled		=	GetConVarBool(g_hKarmaEnabled);
 	g_iAttackLimit		=	GetConVarInt(g_hAttackLimit);
-	g_iBanLimit		=	GetConVarInt(g_hBanLimit);
+	g_iBanLimit			=	GetConVarInt(g_hBanLimit);
 	g_iBanType			=	GetConVarInt(g_hBanType);
 	g_iKarmaLimit		=	GetConVarInt(g_hKarmaLimit);
 	g_iKillKarma		=	GetConVarInt(g_hKillKarma);
 	g_iKillLimit		=	GetConVarInt(g_hKillLimit);
 	g_iSpawnPunishDelay	=	GetConVarInt(g_hSpawnPunishDelay);
+}
+
+public OnClientCookiesCached(client)
+{
+	new iCurrentTime = GetTime();
+	new iStorageTimes[5];
+	iStorageTimes[0] = GetClientCookieTime(client,g_hAttacks);
+	iStorageTimes[1] = GetClientCookieTime(client,g_hBans);
+	iStorageTimes[2] = GetClientCookieTime(client,g_hKarma);
+	iStorageTimes[3] = GetClientCookieTime(client,g_hKicks);
+	iStorageTimes[4] = GetClientCookieTime(client,g_hKills);
+	
+	SortIntegers(iStorageTimes,5,Sort_Descending);
+	
+	new iTwoWeeks = 86400 * 14;
+	new iTimeDifference = iCurrentTime - iStorageTimes[0];
+	if(iTwoWeeks > iTimeDifference)
+		CreateClientPrefs(client);
 }
 
 public ConVarChange_ConVars(Handle:convar, const String:oldValue[], const String:newValue[])
@@ -358,8 +348,78 @@ public MenuHandler_DoNothing(Handle:menu, MenuAction:action, param1, param2) {}
 
 public MenuHandler_Punishment(Handle:menu, MenuAction:action, param1, param2)
 {
+	//	If nothing selected
+	if(action != MenuAction_Select)
+		return;
 	
-}	
+	decl String:sPunishment[32];
+	GetMenuItem(menu, param2, sPunishment, sizeof(sPunishment));
+	
+	new iAttacker	=	GetClientOfUserId(g_iAttacker[param1]),
+		iPunishment	=	FindStringInArray(g_hPunishments, sPunishment);
+	g_iAttacker[param1] = -1;
+	
+	// If Attacker or Punishment is invalid, do nothing
+	if(!iAttacker || iPunishment == -1)
+		return;
+	
+	// If Forgivent
+	if(StrEqual(sPunishment,	"Forgive"))
+	{
+		LogPlayerEvent(iAttacker, "triggered", "Forgiven_For_TeamKill");
+		LogAction(param1, iAttacker, "\"%L\" forgate \"%L\" for team killing",	param1, iAttacker);
+		
+		PrintToChatAll("%c[STAC]%c %t",	CLR_GREEN,	CLR_DEFAULT,	"Forgivent",	param1,	iAttacker);
+	}
+	// If not forgivent
+	else if(StrEqual(sPunishment, "Punish"))
+	{
+		LogPlayerEvent(iAttacker, "triggered", "Punished_ForTeamKill");
+		LogAction(param1, iAttacker, "\"%L\" punished \"%L\" for team killing",	param1,	iAttacker);
+		
+		decl String:sKills[32];
+		GetClientCookie(iAttacker, g_hKills, sKills, sizeof(sKills));
+		PrintToChatAll("%c[STAC]%c %t",	CLR_GREEN,	CLR_DEFAULT,	"Not Forgiven",	iAttacker,	sKills, g_iKillLimit);
+	}
+	// if punished
+	else
+	{
+		decl String:sProperties[64];
+		Format(sProperties, sizeof(sProperties), " (punishment \"%s\")", sPunishment);
+		
+		LogPlayerEvent(iAttacker, "triggered", "Punished_For,TeamKill", false, sProperties);
+		LogAction(param1, iAttacker, "\%L\" punished \"%L\" for team killing %s", param1, iAttacker, sProperties);
+		
+		// If Attacker is alive, punish now
+		if(IsPlayerAlive(iAttacker))
+			PunishPlayer(iPunishment, param1, iAttacker);
+	// Otherwise punish next spawn
+		else
+		{
+			g_hSpawnPunishment[iAttacker] = CreateDataPack();
+			WritePackCell(g_hSpawnPunishment[iAttacker], param1);
+			WritePackString(g_hSpawnPunishment[iAttacker], sPunishment);
+		}
+	}
+}
+
+/**
+ *	Timers
+ */
+public Action:Timer_SpawnPunishment(Handle:timer, any:client)
+{
+	ResetPack(g_hSpawnPunishment[client]);
+	decl String:sPunishment[32];
+	new iVictim = ReadPackCell(g_hSpawnPunishment[client]);
+	ReadPackString(g_hSpawnPunishment[client], sPunishment, sizeof(sPunishment));
+	
+	CloseHandle(g_hSpawnPunishment[client]);
+	g_hSpawnPunishment[client] = INVALID_HANDLE;
+	
+	new iPunishment = FindStringInArray(g_hPunishments, sPunishment);
+	if(iPunishment != -1)
+		PunishPlayer(iPunishment, iVictim, client);
+}
 
 /**
  *	Natives
@@ -465,10 +525,18 @@ public Native_SetInfo(Handle:plugin, numParams)
 }
 
 /**
- *	Unique Functions
+ *	Stocks
  */
  
-CreateClientPrefs(client)
+PunishPlayer(punishment, victim, attacker)
+{
+	Call_StartFunction(g_hPunishmentPlugins[punishment], g_fPunishmentCallbacks[punishment]);
+	Call_PushCell(victim);
+	Call_PushCell(attacker);
+	Call_Finish();
+}
+ 
+ResetClientPrefs(client)
 {
 	if(AreClientCookiesCached(client) == false)
 	{
