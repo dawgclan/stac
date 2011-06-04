@@ -12,6 +12,8 @@
 #define STAC_NAME			"STAC: Base"
 #define STAC_DESCRIPTION	"This is a TK and TA control plugin meant for the Source Engine"
 
+#define _DEBUG				0
+
 public Plugin:myinfo = 
 {
 	name = STAC_NAME,
@@ -28,6 +30,11 @@ enum Mod
 	Mod_Default,
 	Mod_Insurgency
 }
+/**
+*	Arrays
+*/
+new String:STAC_LogFile[PLATFORM_MAX_PATH];
+
 
 new g_iAttacker[MAXPLAYERS + 1] = {-1};
 new g_iAttackLimit;
@@ -64,11 +71,105 @@ new Handle:g_hKarmaLimit;
 new Handle:g_hKickLimit;
 new Handle:g_hKillKarma;
 new Handle:g_hKillLimit;
+new Handle:g_hLogDays;
 new Handle:g_hPunishmentPlugins[64];
 new Handle:g_hPunishments;
 new Handle:g_hSpawnPunishDelay;
 new Handle:g_hSpawnPunishment[MAXPLAYERS + 1];
 new Mod:g_iMod = Mod_Default;
+
+
+// Log File Functions
+BuildLogFilePath()
+{
+	// Build Log File Path
+	decl String:cTime[64];
+	FormatTime(cTime, sizeof(cTime), "logs/stac_%Y%m%d.log");
+
+	new String:LogFile[PLATFORM_MAX_PATH];
+	LogFile = STAC_LogFile;
+
+	BuildPath(Path_SM, STAC_LogFile, sizeof(STAC_LogFile), cTime);
+
+#if _DEBUG
+	LogDebug(false, "BuildLogFilePath - STAC Log File: %s", STAC_LogFile);
+#endif
+
+	if (!StrEqual(STAC_LogFile, LogFile))
+	{
+		LogAction(0, -1, "[STAC] Log File: %s", STAC_LogFile);
+		LogToFile(STAC_LogFile, "SourceMod Team Attack Control Log File");
+
+#if _DEBUG
+		LogDebug(false, "BuildLogFilePath - Log file has been rotated.");
+#endif
+		if (g_hLogDays != INVALID_HANDLE)
+		{
+			if (GetConVarInt(g_hLogDays) > 0)
+			{
+#if _DEBUG
+				LogDebug(false, "BuildLogFilePath - Purging old log files.");
+#endif
+				PurgeOldLogs();
+			}
+		}
+	}
+}
+
+PurgeOldLogs()
+{
+#if _DEBUG
+	LogDebug(false, "PurgeOldLogs - Purging old log files.");
+#endif
+	new String:sLogPath[PLATFORM_MAX_PATH];
+	new String:buffer[256];
+	new Handle:hDirectory = INVALID_HANDLE;
+	new FileType:type = FileType_Unknown;
+
+	BuildPath(Path_SM, sLogPath, sizeof(sLogPath), "logs");
+
+#if _DEBUG
+	LogDebug(false, "PurgeOldLogs - Purging old log files from: %s", sLogPath);
+#endif
+	if ( DirExists(sLogPath) )
+	{
+		hDirectory = OpenDirectory(sLogPath);
+		if (hDirectory != INVALID_HANDLE)
+		{
+			while ( ReadDirEntry(hDirectory, buffer, sizeof(buffer), type) )
+			{
+				if (type == FileType_File)
+				{
+					if (StrContains(buffer, "stac_", false) != -1)
+					{
+						decl String:file[PLATFORM_MAX_PATH];
+						Format(file, sizeof(file), "%s/%s", sLogPath, buffer);
+#if _DEBUG
+						LogDebug(false, "PurgeOldLogs - Checking file: %s", buffer);
+#endif
+						if ( GetFileTime(file, FileTime_LastChange) < (GetTime() - (60 * 60 * 24 * GetConVarInt(g_hLogDays)) + 30) )
+						{
+							// Log file is old
+#if _DEBUG
+							LogDebug(false, "PurgeOldLogs - Log file should be deleted: %s", buffer);
+#endif
+							if (DeleteFile(file))
+							{
+								LogAction(0, -1, "[STAC] Deleted old log file: %s", file);
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	if (hDirectory != INVALID_HANDLE)
+	{
+		CloseHandle(hDirectory);
+	}
+}
+
 
 /**
  *	Plugin Forwards
@@ -95,6 +196,8 @@ public OnAllPluginsLoaded()
  
 public OnPluginStart()
 {
+	BuildLogFilePath();
+
 	//	Create Convars
 	CreateConVar("stac_version",STAC_VERSION,STAC_NAME,FCVAR_DONTRECORD|FCVAR_NOTIFY|FCVAR_PLUGIN);
 	g_hAttackLimit		=	CreateConVar("stac_attack_limit",		"10",	"STAC Attack Limit",												FCVAR_PLUGIN);
@@ -110,6 +213,7 @@ public OnPluginStart()
 	g_hKickLimit		=	CreateConVar("stac_kick_limit",			"3",	"STAC Kick Limit",													FCVAR_PLUGIN);
 	g_hKillKarma		=	CreateConVar("stac_kill_karma",			"1",	"STAC Kill Karma",													FCVAR_PLUGIN);
 	g_hKillLimit		=	CreateConVar("stac_kill_limit",			"3",	"STAC Kill Limit",													FCVAR_PLUGIN);
+	g_hLogDays			=	CreateConVar("stac_log_days",			"0",	"STAC Log Days [0 = Infinite]",										FCVAR_PLUGIN);
 	g_hSpawnPunishDelay	=	CreateConVar("stac_spawnpunish_delay",	"6",	"STAC Spawn Punish Delay",											FCVAR_PLUGIN);
 	//	Hook convar changes
 	HookConVarChange(g_hAttackLimit,		ConVarChange_ConVars);
@@ -165,11 +269,21 @@ public OnPluginStart()
 	g_hKills	=	RegClientCookie("STAC_KILLS",	"Kill Count",			CookieAccess_Private);
 	
 	AutoExecConfig(true, "stac");
-	
+
+	// Purge Old Log Files
+	if (g_hLogDays != INVALID_HANDLE)
+	{
+		if (GetConVarInt(g_hLogDays) > 0)
+		{
+			PurgeOldLogs();
+		}
+	}
 }
 
 public OnMapStart()
 {
+	BuildLogFilePath();
+
 	if (GetConVarBool(g_hAutoUpdate))
 	{
 #if defined _autoupdate_included
@@ -214,7 +328,7 @@ public OnClientCookiesCached(client)
 	new iTwoWeeks = 86400 * 14;
 	new iTimeDifference = iCurrentTime - iStorageTimes[0];
 	if(iTwoWeeks > iTimeDifference)
-		CreateClientPrefs(client);
+		ResetClientPrefs(client);
 }
 
 public ConVarChange_ConVars(Handle:convar, const String:oldValue[], const String:newValue[])
