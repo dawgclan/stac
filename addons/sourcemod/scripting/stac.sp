@@ -6,6 +6,9 @@
 #include <loghelper>
 #include <stac>
 
+#undef REQUIRE_PLUGIN
+#tryinclude <autoupdate>
+
 #define STAC_NAME			"STAC: Base"
 #define STAC_DESCRIPTION	"This is a TK and TA control plugin meant for the Source Engine"
 
@@ -53,6 +56,7 @@ new Handle:g_hBanLimit;
 new Handle:g_hBanTime;
 new Handle:g_hBanType;
 new Handle:g_hEnabled;
+new Handle:g_hAutoUpdate;
 new Handle:g_hIgnoreBots;
 new Handle:g_hImmunity;
 new Handle:g_hKarmaEnabled;
@@ -77,17 +81,28 @@ public APLRes:AskPluginLoad2(Handle:myself, bool:late,String:error[],err_max)
 	CreateNative("STAC_Setinfo",			Native_SetInfo);
 	
 	return APLRes_Success;
-}	
+}
+
+public OnAllPluginsLoaded()
+{
+#if defined _autoupdate_included
+	if (LibraryExists("pluginautoupdate"))
+	{
+		AutoUpdate_AddPlugin("stac.dawgclan.net", "/update.xml", STAC_VERSION);
+	}
+#endif
+}
  
 public OnPluginStart()
 {
 	//	Create Convars
 	CreateConVar("stac_version",STAC_VERSION,STAC_NAME,FCVAR_DONTRECORD|FCVAR_NOTIFY|FCVAR_PLUGIN);
 	g_hAttackLimit		=	CreateConVar("stac_attack_limit",		"10",	"STAC Attack Limit",		FCVAR_PLUGIN);
-	g_hBanLimit		=	CreateConVar("stac_ban_limit",				"3",	"STAC Ban Limit",			FCVAR_PLUGIN);
+	g_hBanLimit			=	CreateConVar("stac_ban_limit",			"3",	"STAC Ban Limit",			FCVAR_PLUGIN);
 	g_hBanTime			=	CreateConVar("stac_ban_time",			"60",	"STAC Ban Time",			FCVAR_PLUGIN);
 	g_hBanType			=	CreateConVar("stac_ban_type",			"0",	"STAC Ban Type",			FCVAR_PLUGIN);
 	g_hEnabled			=	CreateConVar("stac_enabled",			"1",	"STAC Enabled",				FCVAR_PLUGIN);
+	g_hAutoUpdate		=	CreateConVar("stac_autoupdate",			"1",	"STAC Automatic Updating (Requires SourceMod Autoupdate plugin)", FCVAR_PLUGIN);
 	g_hIgnoreBots		=	CreateConVar("stac_ignore_bots",		"1",	"STAC Ignore Bots",			FCVAR_PLUGIN);
 	g_hImmunity			=	CreateConVar("stac_immunity",			"0",	"STAC Immunity",			FCVAR_PLUGIN);
 	g_hKarmaEnabled		=	CreateConVar("stac_karma_enabled",		"1",	"STAC Karma Enabled",		FCVAR_PLUGIN);
@@ -154,8 +169,29 @@ public OnPluginStart()
 	
 }
 
+public OnPluginEnd()
+{
+#if defined _autoupdate_included
+	if (LibraryExists("pluginautoupdate"))
+	{
+		AutoUpdate_RemovePlugin();
+	}
+#endif
+}
+
 public OnMapStart()
 {
+	if (GetConVarBool(g_hAutoUpdate))
+	{
+#if defined _autoupdate_included
+		if (LibraryExists("pluginautoupdate") && !GetConVarBool(FindConVar("sv_lan")))
+		{
+			ServerCommand("sm_autoupdate_download stac");
+		}
+#endif
+	}
+
+
 	GetTeams(g_iMod == Mod_Insurgency);
 	
 	// Make sure client has STAC client prefs
