@@ -12,6 +12,8 @@
 #define IP_BAN_TYPE		1
 
 #define STAC_VERSION	"0.0.1"
+#define STAC_AUTHORS	"Rothgar, FlyingMongoose"
+#define STAC_WEBSITE	"http://dawgclan.github.com/stac"
 
 enum STACInfo
 {
@@ -24,17 +26,18 @@ enum STACInfo
 
 enum STACSetting
 {
-	STACSetting_AttacksLimit,
-	STACSetting_BansLimit,
+	STACSetting_AttackLimit,
+	STACSetting_BanLimit,
 	STACSetting_BanTime,
 	STACSetting_BanType,
 	STACSetting_Enabled,
 	STACSetting_IgnoreBots,
 	STACSetting_Immunity,
+	STACSetting_KarmaEnabled,
 	STACSetting_KarmaLimit,
-	STACSetting_KicksLimit,
+	STACSetting_KickLimit,
 	STACSetting_KillKarma,
-	STACSetting_KillsLimit
+	STACSetting_KillLimit
 }
 
 functag public STACPunishment(victim, attacker);
@@ -56,16 +59,6 @@ native STAC_GetInfo(client, STACInfo:type);
  * @return Value of setting
  */
 native STAC_GetSetting(STACSetting:type);
-
-/**
- * Gives a client karma
- *
- * @param	 client		Player index
- * @param	 karma		Amount of karma to give
- * @param	 reason		Reason for earning karma
- * @noreturn
- */
-native STAC_GiveKarma(client, karma, const String:reason[] = "");
 
 /**
  * Registers an STAC punishment
@@ -102,7 +95,6 @@ public __pl_stac_SetNTVOptional()
 {
 	MarkNativeAsOptional("STAC_GetInfo");
 	MarkNativeAsOptional("STAC_GetSetting");
-	MarkNativeAsOptional("STAC_GiveKarma");
 	MarkNativeAsOptional("STAC_RegisterPunishment");
 	MarkNativeAsOptional("STAC_SetInfo");
 }

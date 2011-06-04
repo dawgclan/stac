@@ -27,14 +27,14 @@ enum Mod
 }
 
 new g_iAttacker[MAXPLAYERS + 1] = {-1};
-new g_iAttacksLimit;
-new g_iBansLimit;
+new g_iAttackLimit;
+new g_iBanLimit;
 new g_iBanTime;
 new g_iBanType;
 new g_iKarmaLimit;
 new g_iKickLimit;
-new g_iKillKarma
-new g_iKillsLimit;
+new g_iKillKarma;
+new g_iKillLimit;
 new g_iSpawnPunishDelay;
 new bool:g_bEnabled;
 new bool:g_bIgnoreBots;
@@ -48,8 +48,8 @@ new Handle:g_hKarma;
 new Handle:g_hKicks;
 new Handle:g_hKills;
 // cvar handles
-new Handle:g_hAttacksLimit;
-new Handle:g_hBansLimit;
+new Handle:g_hAttackLimit;
+new Handle:g_hBanLimit;
 new Handle:g_hBanTime;
 new Handle:g_hBanType;
 new Handle:g_hEnabled;
@@ -59,7 +59,7 @@ new Handle:g_hKarmaEnabled;
 new Handle:g_hKarmaLimit;
 new Handle:g_hKickLimit;
 new Handle:g_hKillKarma;
-new Handle:g_hKillsLimit;
+new Handle:g_hKillLimit;
 new Handle:g_hPunishmentPlugins[64];
 new Handle:g_hPunishments;
 new Handle:g_hSpawnPunishDelay;
@@ -72,9 +72,9 @@ new Mod:g_iMod = Mod_Default;
 public APLRes:AskPluginLoad2(Handle:myself, bool:late,String:error[],err_max)
 {
 	CreateNative("STAC_GetInfo",			Native_GetInfo);
-	CreateNative("STAC_GetSetting",			NativeGetSetting);
+	CreateNative("STAC_GetSetting",			Native_GetSetting);
 	CreateNative("STAC_RegisterPunishment",	Native_RegisterPunishment);
-	CreateNative("STAC_Setinfo",			Native_Setinfo);
+	CreateNative("STAC_Setinfo",			Native_SetInfo);
 	
 	return APLRes_Success;
 }	
@@ -83,8 +83,8 @@ public OnPluginStart()
 {
 	//	Create Convars
 	CreateConVar("stac_version",STAC_VERSION,STAC_NAME,FCVAR_DONTRECORD|FCVAR_NOTIFY|FCVAR_PLUGIN);
-	g_hAttacksLimit		=	CreateConVar("stac_attackslimit",		"10",	"STAC Attack Limit",		FCVAR_PLUGIN);
-	g_hBansLimit		=	CreateConVar("stac_bans_limit",			"3",	"STAC Bans Limit",			FCVAR_PLUGIN);
+	g_hAttackLimit		=	CreateConVar("stac_attack_limit",		"10",	"STAC Attack Limit",		FCVAR_PLUGIN);
+	g_hBanLimit		=	CreateConVar("stac_ban_limit",				"3",	"STAC Ban Limit",			FCVAR_PLUGIN);
 	g_hBanTime			=	CreateConVar("stac_ban_time",			"60",	"STAC Ban Time",			FCVAR_PLUGIN);
 	g_hBanType			=	CreateConVar("stac_ban_type",			"0",	"STAC Ban Type",			FCVAR_PLUGIN);
 	g_hEnabled			=	CreateConVar("stac_enabled",			"1",	"STAC Enabled",				FCVAR_PLUGIN);
@@ -94,12 +94,12 @@ public OnPluginStart()
 	g_hKarmaLimit		=	CreateConVar("stac_karma_limit",		"5",	"STAC Karma Limit",			FCVAR_PLUGIN);
 	g_hKickLimit		=	CreateConVar("stac_kick_limit",			"3",	"STAC Kick Limit",			FCVAR_PLUGIN);
 	g_hKillKarma		=	CreateConVar("stac_kill_karma",			"1",	"STAC Kill Karma",			FCVAR_PLUGIN);
-	g_hKillsLimit		=	CreateConVar("stac_kills_limit",		"3",	"STAC Kills Limit",			FCVAR_PLUGIN);
+	g_hKillLimit		=	CreateConVar("stac_kill_limit",			"3",	"STAC Kill Limit",			FCVAR_PLUGIN);
 	g_hSpawnPunishDelay	=	CreateConVar("stac_spawnpunish_delay",	"6",	"STAC Spawn Punish Delay",	FCVAR_PLUGIN);
 	
 	//	Hook convar changes
-	HookConVarChange(g_hAttacksLimit,		ConVarChange_ConVars);
-	HookConVarChange(g_hBansLimit,			ConVarChange_ConVars);
+	HookConVarChange(g_hAttackLimit,		ConVarChange_ConVars);
+	HookConVarChange(g_hBanLimit,			ConVarChange_ConVars);
 	HookConVarChange(g_hBanTime,			ConVarChange_ConVars);
 	HookConVarChange(g_hBanType,			ConVarChange_ConVars);
 	HookConVarChange(g_hEnabled,			ConVarChange_ConVars);
@@ -109,7 +109,7 @@ public OnPluginStart()
 	HookConVarChange(g_hKarmaLimit,			ConVarChange_ConVars);
 	HookConVarChange(g_hKickLimit,			ConVarChange_ConVars);
 	HookConVarChange(g_hKillKarma,			ConVarChange_ConVars);
-	HookConVarChange(g_hKillsLimit,			ConVarChange_ConVars);
+	HookConVarChange(g_hKillLimit,			ConVarChange_ConVars);
 	HookConVarChange(g_hSpawnPunishDelay,	ConVarChange_ConVars);
 	
 	//	Hook Events
@@ -140,7 +140,7 @@ public OnPluginStart()
 		GetGameDescription(sBuffer,	sizeof(sBuffer));
 		
 		if(StrContains(sBuffer, "Insurgency", false) != -1)
-			g_iMod = Mod_Insurgency
+			g_iMod = Mod_Insurgency;
 	}
 	
 	// Register ClientPrefs
@@ -162,7 +162,7 @@ public OnMapStart()
 	for(new i = 1; i <= MaxClients; i++)
 	{
 		if(IsClientInGame(i) && AreClientCookiesCached(i) == false)
-			CreateClientPrefs(i)
+			CreateClientPrefs(i);
 	}
 }
 
@@ -172,12 +172,12 @@ public OnConfigsExecuted()
 	g_bIgnoreBots		=	GetConVarBool(g_hIgnoreBots);
 	g_bImmunity			=	GetConVarBool(g_hImmunity);
 	g_bKarmaEnabled		=	GetConVarBool(g_hKarmaEnabled);
-	g_iAttacksLimit		=	GetConVarInt(g_hAttacksLimit);
-	g_iBansLimit		=	GetConVarInt(g_hBansLimit);
+	g_iAttackLimit		=	GetConVarInt(g_hAttackLimit);
+	g_iBanLimit		=	GetConVarInt(g_hBanLimit);
 	g_iBanType			=	GetConVarInt(g_hBanType);
 	g_iKarmaLimit		=	GetConVarInt(g_hKarmaLimit);
 	g_iKillKarma		=	GetConVarInt(g_hKillKarma);
-	g_iKillsLimit		=	GetConVarInt(g_hKillsLimit);
+	g_iKillLimit		=	GetConVarInt(g_hKillLimit);
 	g_iSpawnPunishDelay	=	GetConVarInt(g_hSpawnPunishDelay);
 }
 
@@ -191,10 +191,10 @@ public ConVarChange_ConVars(Handle:convar, const String:oldValue[], const String
 		g_bImmunity			=	bool:StringToInt(newValue);
 	else if(convar	==	g_hKarmaEnabled)
 		g_bKarmaEnabled		=	bool:StringToInt(newValue);
-	else if(convar	==	g_hAttacksLimit)
-		g_iAttacksLimit		=	StringToInt(newValue);
-	else if(convar	==	g_hBansLimit)
-		g_iBansLimit		=	StringToInt(newValue);
+	else if(convar	==	g_hAttackLimit)
+		g_iAttackLimit		=	StringToInt(newValue);
+	else if(convar	==	g_hBanLimit)
+		g_iBanLimit		=	StringToInt(newValue);
 	else if(convar	==	g_hBanTime)
 		g_iBanTime			=	StringToInt(newValue);
 	else if(convar	==	g_hBanType)
@@ -205,8 +205,8 @@ public ConVarChange_ConVars(Handle:convar, const String:oldValue[], const String
 		g_iKickLimit		=	StringToInt(newValue);
 	else if(convar	==	g_hKillKarma)
 		g_iKillKarma		=	StringToInt(newValue);
-	else if(convar	==	g_hKillsLimit)
-		g_iKillsLimit		=	StringToInt(newValue);
+	else if(convar	==	g_hKillLimit)
+		g_iKillLimit		=	StringToInt(newValue);
 	else if(convar	==	g_hSpawnPunishDelay)
 		g_iSpawnPunishDelay	=	StringToInt(newValue);
 }
@@ -217,12 +217,207 @@ public ConVarChange_ConVars(Handle:convar, const String:oldValue[], const String
 
 public Action:Command_STACKarma(client,args)
 {
+	if(!g_bEnabled)
+		return Plugin_Handled;
 	
+	//	Format Text for Karma Output Panel
+	decl String:sExit[32], String:sLine1[256], String:sLine2[256], String:sLine3[256], String:sTitle[256], String:sKarma[64];
+	GetClientCookie(client,g_hKarma,sKarma,sizeof(sKarma));
+	Format(sTitle,	sizeof(sTitle),	"%T",		"STAC Karma",	client);
+	Format(sLine1,	sizeof(sLine1),	"%T",		"STAC Karma 1",	client);
+	Format(sLine2,	sizeof(sLine2),	"%T",		"STAC Karma 2",	client, g_iKarmaLimit);
+	Format(sLine3,	sizeof(sLine3),	"%T",		"STAC Karma 3",	client, sKarma);
+	Format(sExit,	sizeof(sExit),	"0. %T",	"Exit",			client);
+	
+	//	Define and Output Panel to Client
+	new Handle:hPanel = CreatePanel();
+	SetPanelTitle(hPanel, sTitle);
+	DrawPanelText(hPanel, " ");
+	DrawPanelText(hPanel, sLine1);
+	DrawPanelText(hPanel, " ");
+	DrawPanelText(hPanel, sLine2);
+	DrawPanelText(hPanel, " ");
+	DrawPanelText(hPanel, sLine3);
+	DrawPanelText(hPanel, " ");
+	DrawPanelText(hPanel, sExit);
+	SendPanelToClient(hPanel, client, MenuHandler_DoNothing, MENU_TIME_FOREVER);
+	
+	return Plugin_Handled;
 }
 
 public Action:Command_STAC(client,args)
 {
+	if(!g_bEnabled)
+		return Plugin_Handled;
 	
+	// Checks to see if there's an argument so that status of a particular player can be displayed
+	decl iTarget, String:sTarget[MAX_NAME_LENGTH + 1];
+	if(GetCmdArgString(sTarget, sizeof(sTarget)))
+	{
+		if((iTarget = FindTarget(client, sTarget)) == -1)
+			return Plugin_Handled;
+	}else{
+		iTarget = client;
+	}
+	
+	// Declare Strings for output
+	decl String:sAttacks[255], String:sBans[255], String:sExit[32], String:sKarma[255], String:sKicks[255], String:sKills[255], String:sName[MAX_NAME_LENGTH + 1], String:sTitle[255];
+	
+	// Getting Client information
+	decl String:sCurrentAttacks[32], String:sCurrentBans[32], String:sCurrentKarma[32], String:sCurrentKicks[32], String:sCurrentKills[32];
+	GetClientCookie(iTarget,	g_hAttacks,	sCurrentAttacks,	sizeof(sCurrentAttacks));
+	GetClientCookie(iTarget,	g_hBans,	sCurrentBans,		sizeof(sCurrentBans));
+	GetClientCookie(iTarget,	g_hKarma,	sCurrentKarma,		sizeof(sCurrentKarma));
+	GetClientCookie(iTarget,	g_hKicks,	sCurrentKicks,		sizeof(sCurrentKicks));
+	GetClientCookie(iTarget,	g_hKills,	sCurrentKills,		sizeof(sCurrentKills));
+	GetClientName(client, sName, sizeof(sName));
+	
+	// Format Display
+	Format(sTitle,		sizeof(sTitle),		"%T",		"TK Status Title",	client,	iTarget);
+	Format(sKarma,		sizeof(sKarma),		"%T",		"Karma Count",		client,	sCurrentKarma,		g_iKarmaLimit);
+	Format(sAttacks,	sizeof(sAttacks),	"%T",		"Attacks Count",	client,	sCurrentAttacks,	g_iAttackLimit);
+	Format(sKills,		sizeof(sKills),		"%T",		"Kills Count",		client,	sCurrentKills,		g_iKillLimit);
+	Format(sKicks,		sizeof(sKicks),		"%T",		"Kicks Count",		client, sCurrentKicks,		g_iKickLimit);
+	Format(sBans,		sizeof(sBans),		"%T",		"Bans Count",		client, sCurrentBans,		g_iBanLimit);
+	Format(sExit,		sizeof(sExit),		"0. %T",	"Exit",				client);
+	
+	// Define and Display Panel
+	new Handle:hPanel = CreatePanel();
+	SetPanelTitle(hPanel, sTitle);
+	DrawPanelText(hPanel, " ");
+	DrawPanelText(hPanel, sKarma);
+	DrawPanelText(hPanel, sAttacks);
+	DrawPanelText(hPanel, sKills);
+	DrawPanelText(hPanel, sKicks);
+	DrawPanelText(hPanel, sBans);
+	DrawPanelText(hPanel, " ");
+	DrawPanelText(hPanel, sExit);
+	SendPanelToClient(hPanel, client, MenuHandler_DoNothing, MENU_TIME_FOREVER);
+	
+	return Plugin_Handled;
+}
+
+/**
+ * Events
+ */
+public Event_PlayerDeath(Handle:event, const String:name[], bool:dontBroadcast)
+{
+	
+}
+
+public Event_PlayerHurt(Handle:event, const String:name[], bool:dontBroadcast)
+{
+	
+}
+
+public Event_PlayerSpawn(Handle:event, const String:name[], bool:dontBroadcast)
+{
+	
+}
+
+/**
+ *	Menu Handlers
+ */
+public MenuHandler_DoNothing(Handle:menu, MenuAction:action, param1, param2) {}
+
+public MenuHandler_Punishment(Handle:menu, MenuAction:action, param1, param2)
+{
+	
+}	
+
+/**
+ *	Natives
+ */
+public Native_GetInfo(Handle:plugin, numParams)
+{
+	new iClient = GetNativeCell(1);
+	decl String:sValue[32];
+	
+	new bool:bSuccess;
+	
+	if(GetNativeCell(2)	==	STACInfo_Attacks)
+	{
+		GetClientCookie(iClient,	g_hAttacks,	sValue,	sizeof(sValue));
+		bSuccess = true;
+	}else if(GetNativeCell(2)	==	STACInfo_Bans){
+		GetClientCookie(iClient,	g_hBans,	sValue,	sizeof(sValue));
+		bSuccess = true;
+	}else if(GetNativeCell(2)	==	STACInfo_Karma){
+		GetClientCookie(iClient,	g_hKarma,	sValue,	sizeof(sValue));
+		bSuccess = true;
+	}else if(GetNativeCell(2)	==	STACInfo_Kills){
+		GetClientCookie(iClient,	g_hKills,	sValue,	sizeof(sValue));
+		bSuccess = true;
+	}else if(GetNativeCell(2)	==	STACInfo_Kicks){
+		GetClientCookie(iClient,	g_hKicks,	sValue,	sizeof(sValue));
+		bSuccess = true;
+	}else{
+		bSuccess = false;
+	}
+	
+	if(bSuccess)
+	{
+		return StringToInt(sValue);
+	}else{
+		return -1;
+	}
+}
+
+public Native_GetSetting(Handle:plugin, numParams)
+{
+	switch(GetNativeCell(1)){
+		case STACSetting_AttackLimit:
+			return g_iAttackLimit;
+		case STACSetting_BanLimit:
+			return g_iBanLimit;
+		case STACSetting_BanTime:
+			return g_iBanTime;
+		case STACSetting_BanType:
+			return g_iBanType;
+		case STACSetting_Enabled:
+			return g_bEnabled;
+		case STACSetting_IgnoreBots:
+			return g_bIgnoreBots;
+		case STACSetting_Immunity:
+			return g_bImmunity;
+		case STACSetting_KarmaEnabled:
+			return g_bKarmaEnabled;
+		case STACSetting_KarmaLimit:
+			return g_iKarmaLimit;
+		case STACSetting_KickLimit:
+			return g_iKickLimit;
+		case STACSetting_KillKarma:
+			return g_iKarmaLimit;
+		case STACSetting_KillLimit:
+			return g_iKillLimit;
+	}
+	
+	return -1;
+}
+
+public Native_RegisterPunishment(Handle:plugin, numParams)
+{
+	
+}
+
+public Native_SetInfo(Handle:plugin, numParams)
+{
+	new iClient = GetNativeCell(1);
+	decl String:sValue[32];
+	IntToString(GetNativeCell(3),sValue,sizeof(sValue));
+	
+	if(GetNativeCell(2)	==	STACInfo_Attacks)
+	{
+		SetClientCookie(iClient,	g_hAttacks,	sValue);
+	}else if(GetNativeCell(2)	==	STACInfo_Bans){
+		SetClientCookie(iClient,	g_hBans,	sValue);
+	}else if(GetNativeCell(2)	==	STACInfo_Karma){
+		SetClientCookie(iClient,	g_hKarma,	sValue);
+	}else if(GetNativeCell(2)	==	STACInfo_Kills){
+		SetClientCookie(iClient,	g_hKills,	sValue);
+	}else if(GetNativeCell(2)	==	STACInfo_Kicks){
+		SetClientCookie(iClient,	g_hKicks,	sValue);
+	}
 }
 
 /**
