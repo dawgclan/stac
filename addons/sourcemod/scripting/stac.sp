@@ -203,7 +203,8 @@ public OnAllPluginsLoaded()
 	/**
 	Now lets check for client prefs extension
 	*/
-	if (CheckExtStatus("clientprefs.ext", true))
+	
+	if (GetExtensionFileStatus("clientprefs.ext"))
 	{
 		LogToFile(STAC_LogFile, "OnAllPluginsLoaded - Client Preferences extension is loaded, checking database.");
 		if (!SQL_CheckConfig("clientprefs"))
@@ -391,7 +392,7 @@ public ConVarChange_ConVars(Handle:convar, const String:oldValue[], const String
 
 public Action:Command_STACKarma(client,args)
 {
-	if(!g_bEnabled)
+	if(!g_bEnabled || !g_bKarmaEnabled)
 		return Plugin_Handled;
 	
 	//	Format Text for Karma Output Panel
@@ -441,14 +442,16 @@ public Action:Command_STAC(client,args)
 	decl String:sCurrentAttacks[32], String:sCurrentBans[32], String:sCurrentKarma[32], String:sCurrentKicks[32], String:sCurrentKills[32];
 	GetClientCookie(iTarget,	g_hAttacks,	sCurrentAttacks,	sizeof(sCurrentAttacks));
 	GetClientCookie(iTarget,	g_hBans,	sCurrentBans,		sizeof(sCurrentBans));
-	GetClientCookie(iTarget,	g_hKarma,	sCurrentKarma,		sizeof(sCurrentKarma));
+	if(g_bKarmaEnabled)
+		GetClientCookie(iTarget,	g_hKarma,	sCurrentKarma,		sizeof(sCurrentKarma));
 	GetClientCookie(iTarget,	g_hKicks,	sCurrentKicks,		sizeof(sCurrentKicks));
 	GetClientCookie(iTarget,	g_hKills,	sCurrentKills,		sizeof(sCurrentKills));
 	GetClientName(client, sName, sizeof(sName));
 	
 	// Format Display
 	Format(sTitle,		sizeof(sTitle),		"%T",		"TK Status Title",	client,	iTarget);
-	Format(sKarma,		sizeof(sKarma),		"%T",		"Karma Count",		client,	sCurrentKarma,		g_iKarmaLimit);
+	if(g_bKarmaEnabled)
+		Format(sKarma,		sizeof(sKarma),		"%T",		"Karma Count",		client,	sCurrentKarma,		g_iKarmaLimit);
 	Format(sAttacks,	sizeof(sAttacks),	"%T",		"Attacks Count",	client,	sCurrentAttacks,	g_iAttackLimit);
 	Format(sKills,		sizeof(sKills),		"%T",		"Kills Count",		client,	sCurrentKills,		g_iKillLimit);
 	Format(sKicks,		sizeof(sKicks),		"%T",		"Kicks Count",		client, sCurrentKicks,		g_iKickLimit);
@@ -459,7 +462,8 @@ public Action:Command_STAC(client,args)
 	new Handle:hPanel = CreatePanel();
 	SetPanelTitle(hPanel, sTitle);
 	DrawPanelText(hPanel, " ");
-	DrawPanelText(hPanel, sKarma);
+	if(g_bKarmaEnabled)
+		DrawPanelText(hPanel, sKarma);
 	DrawPanelText(hPanel, sAttacks);
 	DrawPanelText(hPanel, sKills);
 	DrawPanelText(hPanel, sKicks);
@@ -476,11 +480,42 @@ public Action:Command_STAC(client,args)
  */
 public Event_PlayerDeath(Handle:event, const String:name[], bool:dontBroadcast)
 {
+	new iAttacker	=	GetClientOfUserId(GetEventInt(event, "attacker")),
+		iVictim	=	GetClientOfUserId(GetEventInt(event, "userid"));
+		
+	// if ATAC is Disables, no TK limit, attacker is world, or self damage ignore
+	if(!g_bEnabled || !g_iKillLimit || !iAttacker || iAttacker == iVictim)
+		return;
 	
+	// If ignoring bots is enabled and attacker or victim is a bot, ignore
+	if(g_bIgnoreBots && (IsFakeClient(iAttacker) || IsFakeClient(iVictim)))
+		return;
+	
+	// If it was not a team attack
+	if(GetClientTeam(iAttacker != GetClientTeam(iVictim) && g_bKarmaEnabled))
+	{
+		// Handle karma kills
+		decl String:sReason[256];
+		Format(sReason, sizeof(sReason), "%T", "Killing Enemy", iAttacker);
+		new iAttackerKarma = STAC_GetInfo(iAttacker, STACInfo_Karma) + g_iKillKarma;
+		STAC_SetInfo(iAttacker, STACInfo_Karma, iAttackerKarma);
+		return;
+	}
+	
+	PrintToChat(iVictim, "%c[STAC]%c %t", CLR_GREEN, CLR_DEFAULT, "You Were Killed", iAttacker);
+	
+	// If Immunity is enabled and attacker has custom6 or root, ignore
+	if(g_bImmunity && GetUserFlagBits(iAttacker) & (ADMFLAG_CUSTOM6|ADMFLAG_ROOT))
+		return;
+	
+	PunishMenu(iVictim, iAttacker);
 }
 
 public Event_PlayerHurt(Handle:event, const String:name[], bool:dontBroadcast)
 {
+	new iAttacker	=	GetClientOfUserId(GetEventInt(event, "attacker")),
+		iVictim		=	GetClientOfUserId(GetEventInt(event, "userid"));
+		
 	
 }
 
@@ -675,6 +710,42 @@ public Native_SetInfo(Handle:plugin, numParams)
 /**
  *	Stocks
  */
+ 
+PunishMenu(iVictim, iAttacker)
+{
+	decl String:sForgive[32], String:sPunish[32];
+	Format(sForgive,	sizeof(sForgive),	"%T",	"Forgive",			iVictim);
+	Format(sPunish,		sizeof(sPunish),	"%T",	"Do Not Forgive",	iVictim);
+	g_iAttacker[iVictim] = GetClientUserId(iAttacker);
+	
+	new Handle:hMenu	=	CreateMenu(MenuHandler_Punishment);
+	SetMenuExitButton(hMenu,	false);
+	SetMenuTitle(hMenu,			"[STAC] %T",	"You Were Killed",	iVictim, iAttacker);
+	AddMenuItem(hMenu,			"Forgive",		sForgive);
+	AddMenuItem(hMenu,			"Punish",		sPunish);
+	
+	
+	// If immunity is disabled, or victim can target attacker, add punishments
+	if(!g_bImmunity || CanAdminTarget(GetUserAdmin(iVictim), GetUserAdmin(iAttacker)))
+	{
+		decl String:sPunishment[32];
+		for(new i = 0, iSize = GetArraySize(g_hPunishments); i < iSize; i++)
+		{
+			// If callback is invalid, remove punishment
+			if(g_fPunishmentCallbacks[i] == INVALID_FUNCTION)
+			{
+				RemoveFromArray(g_hPunishments, i);
+				continue;
+			}
+			
+			GetArrayString(g_hPunishments, i, sPunishment, sizeof(sPunishment));
+			AddMenuItem(hMenu, sPunishment, sPunishment);
+		}
+	}
+	
+	DisplayMenu(hMenu, iVictim, MENU_TIME_FOREVER);
+}
+
  
 PunishPlayer(punishment, victim, attacker)
 {
