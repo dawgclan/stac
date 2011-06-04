@@ -199,6 +199,23 @@ public OnAllPluginsLoaded()
 		AutoUpdate_AddPlugin("stac.dawgclan.net", "/update.xml", STAC_VERSION);
 	}
 #endif
+
+	/**
+	Now lets check for client prefs extension
+	*/
+	if (CheckExtStatus("clientprefs.ext", true))
+	{
+		LogToFile(STAC_LogFile, "OnAllPluginsLoaded - Client Preferences extension is loaded, checking database.");
+		if (!SQL_CheckConfig("clientprefs"))
+		{
+			LogToFile(STAC_LogFile, "OnAllPluginsLoaded - No clientprefs database found, check your database.cfg file. Database required.");
+			SetFailState("No clientprefs database found, database required.");
+		}
+	}
+	else
+	{
+		SetFailState("Client Preferences extension is not loaded, plugin required.");
+	}
 }
  
 public OnPluginStart()
