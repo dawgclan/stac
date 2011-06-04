@@ -82,6 +82,16 @@ public APLRes:AskPluginLoad2(Handle:myself, bool:late,String:error[],err_max)
 	
 	return APLRes_Success;
 }	
+
+public OnAllPluginsLoaded()
+{
+#if defined _autoupdate_included
+	if (LibraryExists("pluginautoupdate"))
+	{
+		AutoUpdate_AddPlugin("stac.dawgclan.net", "/update.xml", STAC_VERSION);
+	}
+#endif
+}
  
 public OnPluginStart()
 {
