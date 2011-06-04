@@ -52,30 +52,31 @@ new bool:g_bImmunity;
 new bool:g_bKarmaEnabled;
 new Function:g_fPunishmentCallbacks[64];
 // clientpref handles
-new Handle:g_hAttacks;
-new Handle:g_hBans;
-new Handle:g_hKarma;
-new Handle:g_hKicks;
-new Handle:g_hKills;
+new Handle:g_hAttacks =							INVALID_HANDLE;
+new Handle:g_hBans =							INVALID_HANDLE;
+new Handle:g_hKarma =							INVALID_HANDLE;
+new Handle:g_hKicks =							INVALID_HANDLE;
+new Handle:g_hKills =							INVALID_HANDLE;
 // cvar handles
-new Handle:g_hAttackLimit;
-new Handle:g_hAutoUpdate;
-new Handle:g_hBanLimit;
-new Handle:g_hBanTime;
-new Handle:g_hBanType;
-new Handle:g_hEnabled;
-new Handle:g_hIgnoreBots;
-new Handle:g_hImmunity;
-new Handle:g_hKarmaEnabled;
-new Handle:g_hKarmaLimit;
-new Handle:g_hKickLimit;
-new Handle:g_hKillKarma;
-new Handle:g_hKillLimit;
-new Handle:g_hLogDays;
-new Handle:g_hPunishmentPlugins[64];
-new Handle:g_hPunishments;
-new Handle:g_hSpawnPunishDelay;
-new Handle:g_hSpawnPunishment[MAXPLAYERS + 1];
+new Handle:g_hAttackLimit =						INVALID_HANDLE;
+new Handle:g_hAutoUpdate =						INVALID_HANDLE;
+new Handle:g_hBanLimit =						INVALID_HANDLE;
+new Handle:g_hBanTime =							INVALID_HANDLE;
+new Handle:g_hBanType =							INVALID_HANDLE;
+new Handle:g_hEnabled =							INVALID_HANDLE;
+new Handle:g_hIgnoreBots =						INVALID_HANDLE;
+new Handle:g_hImmunity =						INVALID_HANDLE;
+new Handle:g_hKarmaEnabled =					INVALID_HANDLE;
+new Handle:g_hKarmaLimit =						INVALID_HANDLE;
+new Handle:g_hKickLimit =						INVALID_HANDLE;
+new Handle:g_hKillKarma =						INVALID_HANDLE;
+new Handle:g_hKillLimit =						INVALID_HANDLE;
+new Handle:g_hLogDays =							INVALID_HANDLE;
+new Handle:g_hPunishmentPlugins[64] =			INVALID_HANDLE;
+new Handle:g_hPunishments =						INVALID_HANDLE;
+new Handle:g_hPurgeTime =						INVALID_HANDLE;
+new Handle:g_hSpawnPunishDelay = 				INVALID_HANDLE;
+new Handle:g_hSpawnPunishment[MAXPLAYERS + 1] =	{INVALID_HANDLE, ...};
 new Mod:g_iMod = Mod_Default;
 
 
@@ -214,6 +215,7 @@ public OnPluginStart()
 	g_hKillKarma		=	CreateConVar("stac_kill_karma",			"1",	"STAC Kill Karma",													FCVAR_PLUGIN);
 	g_hKillLimit		=	CreateConVar("stac_kill_limit",			"3",	"STAC Kill Limit",													FCVAR_PLUGIN);
 	g_hLogDays			=	CreateConVar("stac_log_days",			"0",	"STAC Log Days [0 = Infinite]",										FCVAR_PLUGIN);
+	g_hPurgeTime		=	CreateConVar("stac_purge_time", 		"1800", "STAC Time in seconds player data should be kept before purging. [DEFAULT: 30 minutes]", FCVAR_PLUGIN);
 	g_hSpawnPunishDelay	=	CreateConVar("stac_spawnpunish_delay",	"6",	"STAC Spawn Punish Delay",											FCVAR_PLUGIN);
 	//	Hook convar changes
 	HookConVarChange(g_hAttackLimit,		ConVarChange_ConVars);
@@ -325,9 +327,8 @@ public OnClientCookiesCached(client)
 	
 	SortIntegers(iStorageTimes,5,Sort_Descending);
 	
-	new iTwoWeeks = 86400 * 14;
 	new iTimeDifference = iCurrentTime - iStorageTimes[0];
-	if(iTwoWeeks > iTimeDifference)
+	if(iTimeDifference > GetConVarFloat(g_hPurgeTime))
 		ResetClientPrefs(client);
 }
 
