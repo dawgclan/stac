@@ -1,3 +1,9 @@
+// To Do
+/*
+Removal of ClientPref Cookies
+Evaluation of loghelper.inc requirement
+*/
+
 #pragma semicolon 1
 
 #include <sourcemod>
