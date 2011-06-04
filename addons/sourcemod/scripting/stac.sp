@@ -564,7 +564,7 @@ public MenuHandler_Punishment(Handle:menu, MenuAction:action, param1, param2)
 	if(!iAttacker || iPunishment == -1)
 		return;
 	
-	// If Forgivent
+	// If Forgiven
 	if(StrEqual(sPunishment,	"Forgive"))
 	{
 		LogPlayerEvent(iAttacker, "triggered", "Forgiven_For_TeamKill");
@@ -572,7 +572,7 @@ public MenuHandler_Punishment(Handle:menu, MenuAction:action, param1, param2)
 		
 		PrintToChatAll("%c[STAC]%c %t",	CLR_GREEN,	CLR_DEFAULT,	"Forgiven",	param1,	iAttacker);
 	}
-	// If not forgivent
+	// If not forgiven
 	else if(StrEqual(sPunishment, "Punish"))
 	{
 		LogPlayerEvent(iAttacker, "triggered", "Punished_ForTeamKill");
