@@ -11,8 +11,8 @@
 #define STEAM_BAN_TYPE	0
 #define IP_BAN_TYPE		1
 
-#define STAC_VERSION	"0.0.1"
-#define STAC_AUTHORS	"Rothgar, FlyingMongoose"
+#define STAC_VERSION	"0.5.0"
+#define STAC_AUTHORS	"Rothgar, Tsunami, FlyingMongoose"
 #define STAC_WEBSITE	"http://dawgclan.github.com/stac"
 
 enum STACInfo

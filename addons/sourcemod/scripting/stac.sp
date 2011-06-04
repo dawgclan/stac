@@ -516,12 +516,30 @@ public Event_PlayerHurt(Handle:event, const String:name[], bool:dontBroadcast)
 	new iAttacker	=	GetClientOfUserId(GetEventInt(event, "attacker")),
 		iVictim		=	GetClientOfUserId(GetEventInt(event, "userid"));
 		
+	// If disabled, there is no TA Limit, the attacker is the world, or the same as the victim, or if the players are on opposing teams ignore
+	if(!g_bEnabled || !g_iAttackLimit || !iAttacker || iAttacker == iVictim || GetClientTeam(iAttacker) != GetClientTeam(iVictim))
+		return;
 	
+	// If ignoring bots and attacker or victim is a bot, ignore.
+	if(g_bIgnoreBots && (IsFakeClient(iAttacker) || IsFakeClient(iVictim)))
+		return;
+	
+	// If immunity is enabled and attacker is immune, ignore
+	if(g_bImmunity && GetUserFlagBits(iAttacker) & (ADMFLAG_CUSTOM6|ADMFLAG_ROOT))
+		return;
+	
+	new iOldAttacks = STAC_GetInfo(iAttacker, STACInfo_Attacks);
+	
+	STAC_SetInfo(iAttacker, STACInfo_Attacks, iOldAttacks++);
+	
+	PrintToChatAll("%c[STAC]%c %t", CLR_GREEN, CLR_DEFAULT, "Attacks",	iAttacker, STAC_GetInfo(iAttacker,STACInfo_Attacks), g_iAttackLimit);
 }
 
 public Event_PlayerSpawn(Handle:event, const String:name[], bool:dontBroadcast)
 {
-	
+	new iClient = GetClientOfUserId(GetEventInt(event, "userid"));
+	if(g_hSpawnPunishment[iClient])
+		CreateTimer(g_iSpawnPunishDelay * 1.0, Timer_SpawnPunishment, iClient);
 }
 
 /**
@@ -552,17 +570,20 @@ public MenuHandler_Punishment(Handle:menu, MenuAction:action, param1, param2)
 		LogPlayerEvent(iAttacker, "triggered", "Forgiven_For_TeamKill");
 		LogAction(param1, iAttacker, "\"%L\" forgate \"%L\" for team killing",	param1, iAttacker);
 		
-		PrintToChatAll("%c[STAC]%c %t",	CLR_GREEN,	CLR_DEFAULT,	"Forgivent",	param1,	iAttacker);
+		PrintToChatAll("%c[STAC]%c %t",	CLR_GREEN,	CLR_DEFAULT,	"Forgiven",	param1,	iAttacker);
 	}
 	// If not forgivent
 	else if(StrEqual(sPunishment, "Punish"))
 	{
 		LogPlayerEvent(iAttacker, "triggered", "Punished_ForTeamKill");
 		LogAction(param1, iAttacker, "\"%L\" punished \"%L\" for team killing",	param1,	iAttacker);
-		
 		decl String:sKills[32];
 		GetClientCookie(iAttacker, g_hKills, sKills, sizeof(sKills));
-		PrintToChatAll("%c[STAC]%c %t",	CLR_GREEN,	CLR_DEFAULT,	"Not Forgiven",	iAttacker,	sKills, g_iKillLimit);
+		
+		new iOldKills = STAC_GetInfo(iAttacker,STACInfo_Kills);
+		STAC_SetInfo(iAttacker, STACInfo_Kills, iOldKills++);
+		
+		PrintToChatAll("%c[STAC]%c %t",	CLR_GREEN,	CLR_DEFAULT,	"Not Forgiven",	iAttacker,	STAC_GetInfo(iAttacker,STACInfo_Kills), g_iKillLimit);
 	}
 	// if punished
 	else
@@ -693,23 +714,100 @@ public Native_SetInfo(Handle:plugin, numParams)
 	decl String:sValue[32];
 	IntToString(GetNativeCell(3),sValue,sizeof(sValue));
 	
+	new bSuccess = false;
+	
 	if(GetNativeCell(2)	==	STACInfo_Attacks)
 	{
 		SetClientCookie(iClient,	g_hAttacks,	sValue);
+		bSuccess = true;
 	}else if(GetNativeCell(2)	==	STACInfo_Bans){
 		SetClientCookie(iClient,	g_hBans,	sValue);
+		bSuccess = true;
 	}else if(GetNativeCell(2)	==	STACInfo_Karma){
 		SetClientCookie(iClient,	g_hKarma,	sValue);
+		bSuccess = true;
 	}else if(GetNativeCell(2)	==	STACInfo_Kills){
 		SetClientCookie(iClient,	g_hKills,	sValue);
+		bSuccess = true;
 	}else if(GetNativeCell(2)	==	STACInfo_Kicks){
 		SetClientCookie(iClient,	g_hKicks,	sValue);
+		bSuccess = true;
+	}else{
+		bSuccess = false;
+	}
+	
+	if(bSuccess)
+	{
+		CheckInfo(iClient);
 	}
 }
 
 /**
  *	Stocks
  */
+ 
+CheckInfo(client)
+{
+	new iKarma = STAC_GetInfo(client, STACInfo_Karma);
+	if(iKarma >= g_iKarmaLimit)
+	{
+		STAC_SetInfo(client,STACInfo_Karma, 0);
+		new iOldKills = STAC_GetInfo(client, STACInfo_Kills);
+		STAC_SetInfo(client,STACInfo_Kills, iOldKills--);
+	}
+	new iAttacks	=	STAC_GetInfo(client, STACInfo_Attacks);
+	if(iAttacks >= g_iAttackLimit)
+	{
+		STAC_SetInfo(client, STACInfo_Attacks, 0);
+		new iOldKills = STAC_GetInfo(client, STACInfo_Kills);
+		STAC_SetInfo(client,STACInfo_Kills,	iOldKills++);
+		PrintToChatAll("%c[ATAC]%c %t", CLR_GREEN, CLR_DEFAULT, "Kills",   client, STAC_GetInfo(client,STACInfo_Kills),   g_iKillLimit);
+
+	}
+	new iKills		=	STAC_GetInfo(client, STACInfo_Kills);
+	if(iKills >= g_iKillLimit)
+	{
+		STAC_SetInfo(client, STACInfo_Kills, 0);
+		new iOldKicks = STAC_GetInfo(client, STACInfo_Kicks);
+		STAC_SetInfo(client,STACInfo_Kicks, iOldKicks++);
+		KickClient(client, "[STAC] %t", "You Were Kicked");
+	}
+	new iKicks		=	STAC_GetInfo(client, STACInfo_Kicks);
+	if(iKicks >= g_iKickLimit)
+	{
+		STAC_SetInfo(client, STACInfo_Kicks, 0);
+		new iOldBans = STAC_GetInfo(client, STACInfo_Bans);
+		STAC_SetInfo(client, STACInfo_Bans, iOldBans++);
+		decl String:sReason[256];
+		Format(sReason, sizeof(sReason), "[ATAC] %t", "Ban Reason", client);
+		if(!g_iBanType)
+		{
+			BanClient(client,g_iBanTime,BANFLAG_AUTHID,	sReason,sReason,"stac");
+		}else{
+			BanClient(client,g_iBanTime,BANFLAG_IP,		sReason,sReason,"stac");
+		}
+		
+	}
+	new iBans		=	STAC_GetInfo(client, STACInfo_Bans);
+	if(iBans >= g_iBanLimit)
+	{
+		STAC_SetInfo(client, STACInfo_Attacks,	0);
+		STAC_SetInfo(client, STACInfo_Bans,		0);
+		STAC_SetInfo(client, STACInfo_Karma,	0);
+		STAC_SetInfo(client, STACInfo_Kicks,	0);
+		STAC_SetInfo(client, STACInfo_Kills,	0);
+		decl String:sReason[256];
+		Format(sReason, sizeof(sReason), "[ATAC] %t", "Ban Reason", client);
+		if(!g_iBanType)
+		{
+			BanClient(client,0,BANFLAG_IP,		sReason,sReason,"stac");
+		}else{
+			BanClient(client,0,BANFLAG_AUTHID,	sReason,sReason,"stac");
+		}
+	}
+		
+
+}
  
 PunishMenu(iVictim, iAttacker)
 {
