@@ -83,7 +83,7 @@ a:hover, a:active, a:focus { /* this group of selectors will give a keyboard nav
 
 */
 .sidebar1 {
-	float: right;
+	float: left;
 	width: 20%;
 	background: #93A5C4;
 	padding-bottom: 0;
