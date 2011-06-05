@@ -88,6 +88,7 @@ a:hover, a:active, a:focus { /* this group of selectors will give a keyboard nav
 	background: #93A5C4;
 	padding-bottom: 10px;
 	min-height: 100%;
+	height: 100%;
 }
 
 .sidebar2 {
