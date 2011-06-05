@@ -56,6 +56,8 @@ new bool:g_bEnabled;
 new bool:g_bIgnoreBots;
 new bool:g_bImmunity;
 new bool:g_bKarmaEnabled;
+new bool:g_bKarmaAllowBanRemoval;
+new bool:g_bKarmaAllowKickRemoval;
 new Function:g_fPunishmentCallbacks[64];
 // clientpref handles
 new Handle:g_hAttacks =							INVALID_HANDLE;
@@ -73,6 +75,8 @@ new Handle:g_hEnabled =							INVALID_HANDLE;
 new Handle:g_hIgnoreBots =						INVALID_HANDLE;
 new Handle:g_hImmunity =						INVALID_HANDLE;
 new Handle:g_hKarmaEnabled =					INVALID_HANDLE;
+new Handle:g_hKarmaAllowBanRemoval =			INVALID_HANDLE;
+new Handle:g_hKarmaAllowKickRemoval = 			INVALID_HANDLE;
 new Handle:g_hKarmaLimit =						INVALID_HANDLE;
 new Handle:g_hKickLimit =						INVALID_HANDLE;
 new Handle:g_hKillKarma =						INVALID_HANDLE;
@@ -234,36 +238,40 @@ public OnPluginStart()
 
 	//	Create Convars
 	CreateConVar("stac_version",STAC_VERSION,STAC_NAME,FCVAR_DONTRECORD|FCVAR_NOTIFY|FCVAR_PLUGIN);
-	g_hAttackLimit		=	CreateConVar("stac_attack_limit",		"10",	"STAC Attack Limit",												FCVAR_PLUGIN);
-	g_hAutoUpdate		=	CreateConVar("stac_autoupdate",			"1",	"STAC Automatic Updating (Requires SourceMod Autoupdate plugin)",	FCVAR_PLUGIN);
-	g_hBanLimit			=	CreateConVar("stac_ban_limit",			"3",	"STAC Ban Limit",													FCVAR_PLUGIN);
-	g_hBanTime			=	CreateConVar("stac_ban_time",			"60",	"STAC Ban Time",													FCVAR_PLUGIN);
-	g_hBanType			=	CreateConVar("stac_ban_type",			"0",	"STAC Ban Type",													FCVAR_PLUGIN);
-	g_hEnabled			=	CreateConVar("stac_enabled",			"1",	"STAC Enabled",														FCVAR_PLUGIN);
-	g_hIgnoreBots		=	CreateConVar("stac_ignore_bots",		"1",	"STAC Ignore Bots",													FCVAR_PLUGIN);
-	g_hImmunity			=	CreateConVar("stac_immunity",			"0",	"STAC Immunity",													FCVAR_PLUGIN);
-	g_hKarmaEnabled		=	CreateConVar("stac_karma_enabled",		"1",	"STAC Karma Enabled",												FCVAR_PLUGIN);
-	g_hKarmaLimit		=	CreateConVar("stac_karma_limit",		"5",	"STAC Karma Limit",													FCVAR_PLUGIN);
-	g_hKickLimit		=	CreateConVar("stac_kick_limit",			"3",	"STAC Kick Limit",													FCVAR_PLUGIN);
-	g_hKillKarma		=	CreateConVar("stac_kill_karma",			"1",	"STAC Kill Karma",													FCVAR_PLUGIN);
-	g_hKillLimit		=	CreateConVar("stac_kill_limit",			"3",	"STAC Kill Limit",													FCVAR_PLUGIN);
-	g_hLogDays			=	CreateConVar("stac_log_days",			"0",	"STAC Log Days [0 = Infinite]",										FCVAR_PLUGIN);
-	g_hPurgeTime		=	CreateConVar("stac_purge_time", 		"30",	"STAC Time in minutes player data should be kept before purging.",	FCVAR_PLUGIN);
-	g_hSpawnPunishDelay	=	CreateConVar("stac_spawnpunish_delay",	"6",	"STAC Spawn Punish Delay",											FCVAR_PLUGIN);
+	g_hAttackLimit				=	CreateConVar("stac_attack_limit",				"10",	"STAC Attack Limit",												FCVAR_PLUGIN);
+	g_hAutoUpdate				=	CreateConVar("stac_autoupdate",					"1",	"STAC Automatic Updating (Requires SourceMod Autoupdate plugin)",	FCVAR_PLUGIN);
+	g_hBanLimit					=	CreateConVar("stac_ban_limit",					"3",	"STAC Ban Limit",													FCVAR_PLUGIN);
+	g_hBanTime					=	CreateConVar("stac_ban_time",					"60",	"STAC Ban Time",													FCVAR_PLUGIN);
+	g_hBanType					=	CreateConVar("stac_ban_type",					"0",	"STAC Ban Type",													FCVAR_PLUGIN);
+	g_hEnabled					=	CreateConVar("stac_enabled",					"1",	"STAC Enabled",														FCVAR_PLUGIN);
+	g_hIgnoreBots				=	CreateConVar("stac_ignore_bots",				"1",	"STAC Ignore Bots",													FCVAR_PLUGIN);
+	g_hImmunity					=	CreateConVar("stac_immunity",					"0",	"STAC Immunity",													FCVAR_PLUGIN);
+	g_hKarmaEnabled				=	CreateConVar("stac_karma_enabled",				"1",	"STAC Karma Enabled",												FCVAR_PLUGIN);
+	g_hKarmaAllowBanRemoval		=	CreateConVar("stac_karma_allow_ban_removal",	"0",	"STAC Karma Allow Ban Removal",										FCVAR_PLUGIN);
+	g_hKarmaAllowKickRemoval	=	CreateConVar("stac_karma_allow_kick_removal",	"0",	"STAC Karma Allow Kick Removal",									FCVAR_PLUGIN);
+	g_hKarmaLimit				=	CreateConVar("stac_karma_limit",				"5",	"STAC Karma Limit",													FCVAR_PLUGIN);
+	g_hKickLimit				=	CreateConVar("stac_kick_limit",					"3",	"STAC Kick Limit",													FCVAR_PLUGIN);
+	g_hKillKarma				=	CreateConVar("stac_kill_karma",					"1",	"STAC Kill Karma",													FCVAR_PLUGIN);
+	g_hKillLimit				=	CreateConVar("stac_kill_limit",					"3",	"STAC Kill Limit",													FCVAR_PLUGIN);
+	g_hLogDays					=	CreateConVar("stac_log_days",					"0",	"STAC Log Days [0 = Infinite]",										FCVAR_PLUGIN);
+	g_hPurgeTime				=	CreateConVar("stac_purge_time", 				"30",	"STAC Time in minutes player data should be kept before purging.",	FCVAR_PLUGIN);
+	g_hSpawnPunishDelay			=	CreateConVar("stac_spawnpunish_delay",			"6",	"STAC Spawn Punish Delay",											FCVAR_PLUGIN);
 	//	Hook convar changes
-	HookConVarChange(g_hAttackLimit,		ConVarChange_ConVars);
-	HookConVarChange(g_hBanLimit,			ConVarChange_ConVars);
-	HookConVarChange(g_hBanTime,			ConVarChange_ConVars);
-	HookConVarChange(g_hBanType,			ConVarChange_ConVars);
-	HookConVarChange(g_hEnabled,			ConVarChange_ConVars);
-	HookConVarChange(g_hIgnoreBots,			ConVarChange_ConVars);
-	HookConVarChange(g_hImmunity,			ConVarChange_ConVars);
-	HookConVarChange(g_hKarmaEnabled,		ConVarChange_ConVars);
-	HookConVarChange(g_hKarmaLimit,			ConVarChange_ConVars);
-	HookConVarChange(g_hKickLimit,			ConVarChange_ConVars);
-	HookConVarChange(g_hKillKarma,			ConVarChange_ConVars);
-	HookConVarChange(g_hKillLimit,			ConVarChange_ConVars);
-	HookConVarChange(g_hSpawnPunishDelay,	ConVarChange_ConVars);
+	HookConVarChange(g_hAttackLimit,			ConVarChange_ConVars);
+	HookConVarChange(g_hBanLimit,				ConVarChange_ConVars);
+	HookConVarChange(g_hBanTime,				ConVarChange_ConVars);
+	HookConVarChange(g_hBanType,				ConVarChange_ConVars);
+	HookConVarChange(g_hEnabled,				ConVarChange_ConVars);
+	HookConVarChange(g_hIgnoreBots,				ConVarChange_ConVars);
+	HookConVarChange(g_hImmunity,				ConVarChange_ConVars);
+	HookConVarChange(g_hKarmaEnabled,			ConVarChange_ConVars);
+	HookConVarChange(g_hKarmaAllowBanRemoval,	ConVarChange_ConVars);
+	HookConVarChange(g_hKarmaAllowKickRemoval,	ConVarChange_ConVars);
+	HookConVarChange(g_hKarmaLimit,				ConVarChange_ConVars);
+	HookConVarChange(g_hKickLimit,				ConVarChange_ConVars);
+	HookConVarChange(g_hKillKarma,				ConVarChange_ConVars);
+	HookConVarChange(g_hKillLimit,				ConVarChange_ConVars);
+	HookConVarChange(g_hSpawnPunishDelay,		ConVarChange_ConVars);
 	
 	//	Hook Events
 	HookEvent("player_death",	Event_PlayerDeath);
@@ -335,17 +343,19 @@ public OnMapStart()
 
 public OnConfigsExecuted()
 {
-	g_bEnabled			=	GetConVarBool(g_hEnabled);
-	g_bIgnoreBots		=	GetConVarBool(g_hIgnoreBots);
-	g_bImmunity			=	GetConVarBool(g_hImmunity);
-	g_bKarmaEnabled		=	GetConVarBool(g_hKarmaEnabled);
-	g_iAttackLimit		=	GetConVarInt(g_hAttackLimit);
-	g_iBanLimit			=	GetConVarInt(g_hBanLimit);
-	g_iBanType			=	GetConVarInt(g_hBanType);
-	g_iKarmaLimit		=	GetConVarInt(g_hKarmaLimit);
-	g_iKillKarma		=	GetConVarInt(g_hKillKarma);
-	g_iKillLimit		=	GetConVarInt(g_hKillLimit);
-	g_iSpawnPunishDelay	=	GetConVarInt(g_hSpawnPunishDelay);
+	g_bEnabled					=	GetConVarBool(g_hEnabled);
+	g_bIgnoreBots				=	GetConVarBool(g_hIgnoreBots);
+	g_bImmunity					=	GetConVarBool(g_hImmunity);
+	g_bKarmaEnabled				=	GetConVarBool(g_hKarmaEnabled);
+	g_bKarmaAllowBanRemoval		=	GetConVarBool(g_hKarmaAllowBanRemoval);
+	g_bKarmaAllowKickRemoval	=	GetConVarBool(g_hKarmaAllowKickRemoval);
+	g_iAttackLimit				=	GetConVarInt(g_hAttackLimit);
+	g_iBanLimit					=	GetConVarInt(g_hBanLimit);
+	g_iBanType					=	GetConVarInt(g_hBanType);
+	g_iKarmaLimit				=	GetConVarInt(g_hKarmaLimit);
+	g_iKillKarma				=	GetConVarInt(g_hKillKarma);
+	g_iKillLimit				=	GetConVarInt(g_hKillLimit);
+	g_iSpawnPunishDelay			=	GetConVarInt(g_hSpawnPunishDelay);
 }
 
 public OnClientCookiesCached(client)
@@ -368,31 +378,35 @@ public OnClientCookiesCached(client)
 public ConVarChange_ConVars(Handle:convar, const String:oldValue[], const String:newValue[])
 {
 	if(convar	==	g_hEnabled)
-		g_bEnabled			=	bool:StringToInt(newValue);
+		g_bEnabled					=	bool:StringToInt(newValue);
 	else if(convar	==	g_hIgnoreBots)
-		g_bIgnoreBots		=	bool:StringToInt(newValue);
+		g_bIgnoreBots				=	bool:StringToInt(newValue);
 	else if(convar	==	g_hImmunity)
-		g_bImmunity			=	bool:StringToInt(newValue);
+		g_bImmunity					=	bool:StringToInt(newValue);
 	else if(convar	==	g_hKarmaEnabled)
-		g_bKarmaEnabled		=	bool:StringToInt(newValue);
+		g_bKarmaEnabled				=	bool:StringToInt(newValue);
+	else if(convar	==	g_hKarmaAllowBanRemoval)
+		g_bKarmaAllowBanRemoval		=	bool:StringToInt(newValue);
+	else if(convar	==	g_hKarmaAllowKickRemoval)
+		g_bKarmaAllowKickRemoval	=	bool:StringToInt(newValue);
 	else if(convar	==	g_hAttackLimit)
-		g_iAttackLimit		=	StringToInt(newValue);
+		g_iAttackLimit				=	StringToInt(newValue);
 	else if(convar	==	g_hBanLimit)
-		g_iBanLimit		=	StringToInt(newValue);
+		g_iBanLimit					=	StringToInt(newValue);
 	else if(convar	==	g_hBanTime)
-		g_iBanTime			=	StringToInt(newValue);
+		g_iBanTime					=	StringToInt(newValue);
 	else if(convar	==	g_hBanType)
-		g_iBanType			=	StringToInt(newValue);
+		g_iBanType					=	StringToInt(newValue);
 	else if(convar	==	g_hKarmaLimit)
-		g_iKarmaLimit		=	StringToInt(newValue);
+		g_iKarmaLimit				=	StringToInt(newValue);
 	else if(convar	==	g_hKickLimit)
-		g_iKickLimit		=	StringToInt(newValue);
+		g_iKickLimit				=	StringToInt(newValue);
 	else if(convar	==	g_hKillKarma)
-		g_iKillKarma		=	StringToInt(newValue);
+		g_iKillKarma				=	StringToInt(newValue);
 	else if(convar	==	g_hKillLimit)
-		g_iKillLimit		=	StringToInt(newValue);
+		g_iKillLimit				=	StringToInt(newValue);
 	else if(convar	==	g_hSpawnPunishDelay)
-		g_iSpawnPunishDelay	=	StringToInt(newValue);
+		g_iSpawnPunishDelay			=	StringToInt(newValue);
 }
 
 /**
@@ -757,65 +771,104 @@ public Native_SetInfo(Handle:plugin, numParams)
  
 CheckInfo(client)
 {
-	new iKarma = STAC_GetInfo(client, STACInfo_Karma);
-	if(iKarma >= g_iKarmaLimit)
+	if(g_bKarmaEnabled)
 	{
-		STAC_SetInfo(client,STACInfo_Karma, 0);
-		new iOldKills = STAC_GetInfo(client, STACInfo_Kills);
-		STAC_SetInfo(client,STACInfo_Kills, iOldKills--);
-	}
-	new iAttacks	=	STAC_GetInfo(client, STACInfo_Attacks);
-	if(iAttacks >= g_iAttackLimit)
-	{
-		STAC_SetInfo(client, STACInfo_Attacks, 0);
-		new iOldKills = STAC_GetInfo(client, STACInfo_Kills);
-		STAC_SetInfo(client,STACInfo_Kills,	iOldKills++);
-		PrintToChatAll("%c[ATAC]%c %t", CLR_GREEN, CLR_DEFAULT, "Kills",   client, STAC_GetInfo(client,STACInfo_Kills),   g_iKillLimit);
-
-	}
-	new iKills		=	STAC_GetInfo(client, STACInfo_Kills);
-	if(iKills >= g_iKillLimit)
-	{
-		STAC_SetInfo(client, STACInfo_Kills, 0);
-		new iOldKicks = STAC_GetInfo(client, STACInfo_Kicks);
-		STAC_SetInfo(client,STACInfo_Kicks, iOldKicks++);
-		KickClient(client, "[STAC] %t", "You Were Kicked");
-	}
-	new iKicks		=	STAC_GetInfo(client, STACInfo_Kicks);
-	if(iKicks >= g_iKickLimit)
-	{
-		STAC_SetInfo(client, STACInfo_Kicks, 0);
-		new iOldBans = STAC_GetInfo(client, STACInfo_Bans);
-		STAC_SetInfo(client, STACInfo_Bans, iOldBans++);
-		decl String:sReason[256];
-		Format(sReason, sizeof(sReason), "[ATAC] %t", "Ban Reason", client);
-		if(!g_iBanType)
+		new iKarma = STAC_GetInfo(client, STACInfo_Karma);
+		if(iKarma >= g_iKarmaLimit)
 		{
-			BanClient(client,g_iBanTime,BANFLAG_AUTHID,	sReason,sReason,"stac");
-		}else{
-			BanClient(client,g_iBanTime,BANFLAG_IP,		sReason,sReason,"stac");
-		}
-		
-	}
-	new iBans		=	STAC_GetInfo(client, STACInfo_Bans);
-	if(iBans >= g_iBanLimit)
-	{
-		STAC_SetInfo(client, STACInfo_Attacks,	0);
-		STAC_SetInfo(client, STACInfo_Bans,		0);
-		STAC_SetInfo(client, STACInfo_Karma,	0);
-		STAC_SetInfo(client, STACInfo_Kicks,	0);
-		STAC_SetInfo(client, STACInfo_Kills,	0);
-		decl String:sReason[256];
-		Format(sReason, sizeof(sReason), "[ATAC] %t", "Ban Reason", client);
-		if(!g_iBanType)
-		{
-			BanClient(client,0,BANFLAG_IP,		sReason,sReason,"stac");
-		}else{
-			BanClient(client,0,BANFLAG_AUTHID,	sReason,sReason,"stac");
+			if(g_iKillLimit > 0)
+			{
+				new iOldKills = STAC_GetInfo(client,	STACInfo_Kills);
+				STAC_SetInfo(client,	STACInfo_Kills,		iOldKills--);
+			}
+			else if(g_iKickLimit > 0 && g_bKarmaAllowKickRemoval)
+			{
+				new iOldKicks = STAC_GetInfo(client,	STACInfo_Kicks);
+				STAC_SetInfo(client,	STACInfo_Kicks,		iOldKicks--);
+			}
+			else if(g_iBanLimit > 0 && g_bKarmaAllowBanRemoval)
+			{
+				new iOldBans = STAC_GetInfo(client,		STACInfo_Bans);
+				STAC_SetInfo(client,	STACInfo_Bans,	iOldBans--);
+			}
+			STAC_SetInfo(client,STACInfo_Karma, 0);
 		}
 	}
-		
-
+	if(g_iBanLimit > 0)
+	{
+		new iBans		=	STAC_GetInfo(client, STACInfo_Bans);
+		if(iBans >= g_iBanLimit)
+		{
+			decl String:sReason[256];
+			Format(sReason, sizeof(sReason), "[ATAC] %t", "Ban Reason", client);
+			if(IsClientInGame(client))
+			{
+				if(!g_iBanType)
+				{
+					BanClient(client,0,BANFLAG_IP,		sReason,sReason,"stac");
+				}else{
+					BanClient(client,0,BANFLAG_AUTHID,	sReason,sReason,"stac");
+				}
+			}
+		}
+	}
+	if(g_iKickLimit > 0)
+	{
+		new iKicks		=	STAC_GetInfo(client, STACInfo_Kicks);
+		if(iKicks >= g_iKickLimit)
+		{
+			new iOldBans = STAC_GetInfo(client, STACInfo_Bans);
+			STAC_SetInfo(client, STACInfo_Bans, iOldBans++);
+			STAC_SetInfo(client, STACInfo_Attacks,	0);
+			STAC_SetInfo(client, STACInfo_Karma,	0);
+			STAC_SetInfo(client, STACInfo_Kicks,	0);
+			STAC_SetInfo(client, STACInfo_Kills,	0);
+			decl String:sReason[256];
+			Format(sReason, sizeof(sReason), "[ATAC] %t", "Ban Reason", client);
+			if(IsClientInGame(client))
+			{
+				if(!g_iBanType)
+				{
+					BanClient(client,g_iBanTime,BANFLAG_AUTHID,	sReason,sReason,"stac");
+				}else{
+					BanClient(client,g_iBanTime,BANFLAG_IP,		sReason,sReason,"stac");
+				}
+			}
+		}
+	}
+	if(g_iKillLimit > 0)
+	{
+		new iKills		=	STAC_GetInfo(client, STACInfo_Kills);
+		if(iKills >= g_iKillLimit)
+		{
+			if(g_iKickLimit > 0)
+			{
+				new iOldKicks = STAC_GetInfo(client, STACInfo_Kicks);
+				STAC_SetInfo(client,STACInfo_Kicks, iOldKicks++);
+				if(IsClientInGame(client))
+				{
+					KickClient(client, "[STAC] %t", "You Were Kicked");
+				}
+			}
+			else if(g_iBanLimit > 0)
+			{
+				new iOldBans = STAC_GetInfo(client,	STACInfo_Bans);
+				STAC_SetInfo(client,STACInfo_Bans,	iOldBans++);
+			}
+			STAC_SetInfo(client, STACInfo_Kills, 0);
+		}
+	}
+	if(g_iAttackLimit > 0)
+	{
+		new iAttacks	=	STAC_GetInfo(client, STACInfo_Attacks);
+		if(iAttacks >= g_iAttackLimit)
+		{
+			new iOldKills = STAC_GetInfo(client, STACInfo_Kills);
+			STAC_SetInfo(client,STACInfo_Kills,	iOldKills++);
+			PrintToChatAll("%c[ATAC]%c %t", CLR_GREEN, CLR_DEFAULT, "Kills",   client, STAC_GetInfo(client,STACInfo_Kills),   g_iKillLimit);
+			STAC_SetInfo(client, STACInfo_Attacks, 0);
+		}
+	}
 }
  
 PunishMenu(iVictim, iAttacker)
