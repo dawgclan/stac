@@ -521,6 +521,7 @@ public Event_PlayerDeath(Handle:event, const String:name[], bool:dontBroadcast)
 		decl String:sReason[256];
 		Format(sReason, sizeof(sReason), "%T", "Killing Enemy", iAttacker);
 		new iAttackerKarma = STAC_GetInfo(iAttacker, STACInfo_Karma) + g_iKillKarma;
+		PrintToChat(iAttacker, "%c[STAC]%c %t %s", CLR_GREEN, CLR_DEFAULT, "Earned Karma", iAttackerKarma, g_iKarmaLimit, sReason);
 		STAC_SetInfo(iAttacker, STACInfo_Karma, iAttackerKarma);
 		return;
 	}
@@ -784,16 +785,20 @@ CheckInfo(client)
 			{
 				new iOldKills = STAC_GetInfo(client,	STACInfo_Kills);
 				STAC_SetInfo(client,	STACInfo_Kills,		iOldKills--);
+				PrintToChat(client, "%c[STAC]%c %t", CLR_GREEN, CLR_DEFAULT, "Now Have Kills",  STAC_GetInfo(client, STACInfo_Kills), g_iKillLimit);
+
 			}
 			else if(g_iKickLimit > 0 && g_bKarmaKickRemove)
 			{
 				new iOldKicks = STAC_GetInfo(client,	STACInfo_Kicks);
 				STAC_SetInfo(client,	STACInfo_Kicks,		iOldKicks--);
+				PrintToChat(client, "%c[STAC]%c %t", CLR_GREEN, CLR_DEFAULT, "Now Have Kicks",  STAC_GetInfo(client, STACInfo_Kicks), g_iKickLimit);
 			}
 			else if(g_iBanLimit > 0 && g_bKarmaBanRemove)
 			{
 				new iOldBans = STAC_GetInfo(client,		STACInfo_Bans);
 				STAC_SetInfo(client,	STACInfo_Bans,	iOldBans--);
+				PrintToChat(client, "%c[STAC]%c %t", CLR_GREEN, CLR_DEFAULT, "Now Have Bans",  STAC_GetInfo(client, STACInfo_Bans), g_iBanLimit);
 			}
 			STAC_SetInfo(client,STACInfo_Karma, 0);
 		}

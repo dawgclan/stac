@@ -93,6 +93,16 @@
 		"#format"	"{1:i},{2:i}"
 		"en"		"You now have {1}/{2} team kills."
 	}
+	"Now Have Kicks"
+	{
+		"#format"	"{1:i},{2:i}"
+		"en"		"You now have {1}/{2} kicks."
+	}
+	"Now Have Bans"
+	{
+		"#format"	"{1:i},{2:i}"
+		"en"		"You now have {1}/{2} bans."
+	}
 	"Kills"
 	{
 		"#format"	"{1:N},{2:i},{3:i}"
