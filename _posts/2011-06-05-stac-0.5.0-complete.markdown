@@ -9,13 +9,13 @@ It provides absolute basic TK management options, nothing more than a "Forgive" 
 
 Here is a list of what has been implemented.
 
-	* Basic Forgive/Punish</li>
-	* Basic Kill-Based Karma</li>
-	* Auto-Update Support</li>
-	* Logging (for stat-interpretation)</li>
+	* Basic Forgive/Punish
+	* Basic Kill-Based Karma
+	* Auto-Update Support
+	* Logging (for stat-interpretation)
 	* Tiered Punishment (X Represents a cvar so if you don't want any kicking to happen, just set to 0, etc.)
-		** X Team Attacks = 1 Team Kill</li>
-		** X Team Kills = 1 Kick</li>
-		** X Kicks = 1 Temp Ban</li>
-		** X Bans = Perma-Ban</li>
+		** X Team Attacks = 1 Team Kill
+		** X Team Kills = 1 Kick
+		** X Kicks = 1 Temp Ban
+		** X Bans = Perma-Ban
 	* Plugin Natives/Forwards
