@@ -106,7 +106,8 @@ a:hover, a:active, a:focus { /* this group of selectors will give a keyboard nav
 }
 
 .main {
-	margin: auto;
+	margin: 0;
+	text-align: center;
 	background-color: #fff;
 	height: 100%;
 	width: 100%;
@@ -121,7 +122,7 @@ a:hover, a:active, a:focus { /* this group of selectors will give a keyboard nav
 ul.nav {
 	list-style: none; /* this removes the list marker */
 	border-top: 1px solid #666; /* this creates the top border for the links - all others are placed using a bottom border on the LI */
-	margin-bottom: 15px; /* this creates the space between the navigation on the content below */
+	margin-bottom: 0; /* this creates the space between the navigation on the content below */
 }
 ul.nav li {
 	border-bottom: 1px solid #666; /* this creates the button separation */
