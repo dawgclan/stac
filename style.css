@@ -141,7 +141,7 @@ ul.nav a:hover, ul.nav a:active, ul.nav a:focus { /* this changes the background
 .footer {
 	margin: 0;
 	text-align: center;
-	padding: 10px 0;
+	vertical-align: middle;
 	background: #6F7D94;
 	position: relative;/* this gives IE6 hasLayout to properly clear */
 	clear: both; /* this clear property forces the .container to understand where the columns end and contain them */
