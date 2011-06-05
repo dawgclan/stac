@@ -100,14 +100,6 @@ a:hover, a:active, a:focus { /* this group of selectors will give a keyboard nav
 	height: auto;
 }
 
-.sidebar2 {
-	width: 20%;
-	background: #93A5C4;
-	padding-bottom: 10px;
-	min-height: 100%;
-	height: 100%;
-}
-
 .content {
 	padding: 10px 0;
 	width: 80%;
