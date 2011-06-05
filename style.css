@@ -97,13 +97,14 @@ a:hover, a:active, a:focus { /* this group of selectors will give a keyboard nav
 	background: #93A5C4;
 	padding-bottom: 10px;
 	min-height: inherit;
-	height: auto;
+	height: 100%;
 }
 
 .content {
 	padding: 10px 0;
 	width: 80%;
 		float: right;
+	height: 100%;
 }
 
 .main {
