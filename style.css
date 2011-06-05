@@ -140,7 +140,7 @@ ul.nav a:hover, ul.nav a:active, ul.nav a:focus { /* this changes the background
 
 /* ~~ The footer ~~ */
 .footer {
-	margin: auto;
+	margin: 0;
 	text-align: center;
 	padding: 10px 0;
 	background: #6F7D94;
