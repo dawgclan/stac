@@ -108,6 +108,7 @@ a:hover, a:active, a:focus { /* this group of selectors will give a keyboard nav
 
 /* ~~ The navigation list styles (can be removed if you choose to use a premade flyout menu like Spry) ~~ */
 ul.nav {
+	height: 100%;
 	list-style: none; /* this removes the list marker */
 	border-top: 1px solid #666; /* this creates the top border for the links - all others are placed using a bottom border on the LI */
 	margin-bottom: 15px; /* this creates the space between the navigation on the content below */
