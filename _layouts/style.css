@@ -101,7 +101,12 @@ a:hover, a:active, a:focus { /* this group of selectors will give a keyboard nav
 .content {
 	padding: 10px 0;
 	width: 80%;
-		float: right;
+	float: right;
+}
+
+.contentcontainer {
+	width: 80%;
+	margin: auto;
 }
 
 /* ~~ This grouped selector gives the lists in the .content area space ~~ */
