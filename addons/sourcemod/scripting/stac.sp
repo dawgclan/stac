@@ -191,6 +191,15 @@ public APLRes:AskPluginLoad2(Handle:myself, bool:late,String:error[],err_max)
 	return APLRes_Success;
 }	
 
+public OnClientDisconnec(client)
+{
+	if(g_hSpawnPunishment[client] != INVALID_HANDLE)
+	{
+		KillTimer(g_hSpawnPunishment[client]);
+		g_hSpawnPunishment[client] = INVALID_HANDLE;
+	}
+}
+
 public OnAllPluginsLoaded()
 {
 #if defined _autoupdate_included
