@@ -56,8 +56,8 @@ new bool:g_bEnabled;
 new bool:g_bIgnoreBots;
 new bool:g_bImmunity;
 new bool:g_bKarmaEnabled;
-new bool:g_bKarmaAllowBanRemoval;
-new bool:g_bKarmaAllowKickRemoval;
+new bool:g_bKarmaBanRemove;
+new bool:g_bKarmaKickRemove;
 new Function:g_fPunishmentCallbacks[64];
 // clientpref handles
 new Handle:g_hAttacks =							INVALID_HANDLE;
@@ -75,8 +75,8 @@ new Handle:g_hEnabled =							INVALID_HANDLE;
 new Handle:g_hIgnoreBots =						INVALID_HANDLE;
 new Handle:g_hImmunity =						INVALID_HANDLE;
 new Handle:g_hKarmaEnabled =					INVALID_HANDLE;
-new Handle:g_hKarmaAllowBanRemoval =			INVALID_HANDLE;
-new Handle:g_hKarmaAllowKickRemoval = 			INVALID_HANDLE;
+new Handle:g_hKarmaBanRemove =				INVALID_HANDLE;
+new Handle:g_hKarmaKickRemove = 			INVALID_HANDLE;
 new Handle:g_hKarmaLimit =						INVALID_HANDLE;
 new Handle:g_hKickLimit =						INVALID_HANDLE;
 new Handle:g_hKillKarma =						INVALID_HANDLE;
@@ -247,8 +247,8 @@ public OnPluginStart()
 	g_hIgnoreBots				=	CreateConVar("stac_ignore_bots",				"1",	"STAC Ignore Bots",													FCVAR_PLUGIN);
 	g_hImmunity					=	CreateConVar("stac_immunity",					"0",	"STAC Immunity",													FCVAR_PLUGIN);
 	g_hKarmaEnabled				=	CreateConVar("stac_karma_enabled",				"1",	"STAC Karma Enabled",												FCVAR_PLUGIN);
-	g_hKarmaAllowBanRemoval		=	CreateConVar("stac_karma_allow_ban_removal",	"0",	"STAC Karma Allow Ban Removal",										FCVAR_PLUGIN);
-	g_hKarmaAllowKickRemoval	=	CreateConVar("stac_karma_allow_kick_removal",	"0",	"STAC Karma Allow Kick Removal",									FCVAR_PLUGIN);
+	g_hKarmaBanRemove		=	CreateConVar("stac_karma_allow_ban_remove",		"0",	"STAC Karma Allow Ban Remove",										FCVAR_PLUGIN);
+	g_hKarmaKickRemove		=	CreateConVar("stac_karma_allow_kick_remove",	"0",	"STAC Karma Allow Kick Remove",									FCVAR_PLUGIN);
 	g_hKarmaLimit				=	CreateConVar("stac_karma_limit",				"5",	"STAC Karma Limit",													FCVAR_PLUGIN);
 	g_hKickLimit				=	CreateConVar("stac_kick_limit",					"3",	"STAC Kick Limit",													FCVAR_PLUGIN);
 	g_hKillKarma				=	CreateConVar("stac_kill_karma",					"1",	"STAC Kill Karma",													FCVAR_PLUGIN);
@@ -265,8 +265,8 @@ public OnPluginStart()
 	HookConVarChange(g_hIgnoreBots,				ConVarChange_ConVars);
 	HookConVarChange(g_hImmunity,				ConVarChange_ConVars);
 	HookConVarChange(g_hKarmaEnabled,			ConVarChange_ConVars);
-	HookConVarChange(g_hKarmaAllowBanRemoval,	ConVarChange_ConVars);
-	HookConVarChange(g_hKarmaAllowKickRemoval,	ConVarChange_ConVars);
+	HookConVarChange(g_hKarmaBanRemove,	ConVarChange_ConVars);
+	HookConVarChange(g_hKarmaKickRemove,	ConVarChange_ConVars);
 	HookConVarChange(g_hKarmaLimit,				ConVarChange_ConVars);
 	HookConVarChange(g_hKickLimit,				ConVarChange_ConVars);
 	HookConVarChange(g_hKillKarma,				ConVarChange_ConVars);
@@ -347,8 +347,8 @@ public OnConfigsExecuted()
 	g_bIgnoreBots				=	GetConVarBool(g_hIgnoreBots);
 	g_bImmunity					=	GetConVarBool(g_hImmunity);
 	g_bKarmaEnabled				=	GetConVarBool(g_hKarmaEnabled);
-	g_bKarmaAllowBanRemoval		=	GetConVarBool(g_hKarmaAllowBanRemoval);
-	g_bKarmaAllowKickRemoval	=	GetConVarBool(g_hKarmaAllowKickRemoval);
+	g_bKarmaBanRemove		=	GetConVarBool(g_hKarmaBanRemove);
+	g_bKarmaKickRemove		=	GetConVarBool(g_hKarmaKickRemove);
 	g_iAttackLimit				=	GetConVarInt(g_hAttackLimit);
 	g_iBanLimit					=	GetConVarInt(g_hBanLimit);
 	g_iBanType					=	GetConVarInt(g_hBanType);
@@ -385,10 +385,10 @@ public ConVarChange_ConVars(Handle:convar, const String:oldValue[], const String
 		g_bImmunity					=	bool:StringToInt(newValue);
 	else if(convar	==	g_hKarmaEnabled)
 		g_bKarmaEnabled				=	bool:StringToInt(newValue);
-	else if(convar	==	g_hKarmaAllowBanRemoval)
-		g_bKarmaAllowBanRemoval		=	bool:StringToInt(newValue);
-	else if(convar	==	g_hKarmaAllowKickRemoval)
-		g_bKarmaAllowKickRemoval	=	bool:StringToInt(newValue);
+	else if(convar	==	g_hKarmaBanRemove)
+		g_bKarmaBanRemove		=	bool:StringToInt(newValue);
+	else if(convar	==	g_hKarmaKickRemove)
+		g_bKarmaKickRemove	=	bool:StringToInt(newValue);
 	else if(convar	==	g_hAttackLimit)
 		g_iAttackLimit				=	StringToInt(newValue);
 	else if(convar	==	g_hBanLimit)
@@ -705,6 +705,10 @@ public Native_GetSetting(Handle:plugin, numParams)
 			return g_bImmunity;
 		case STACSetting_KarmaEnabled:
 			return g_bKarmaEnabled;
+		case STACSetting_KarmaBanRemove:
+			return g_bKarmaBanRemove;
+		case STACSetting_KarmaKickRemove:
+			return g_bKarmaKickRemove;
 		case STACSetting_KarmaLimit:
 			return g_iKarmaLimit;
 		case STACSetting_KickLimit:
@@ -781,12 +785,12 @@ CheckInfo(client)
 				new iOldKills = STAC_GetInfo(client,	STACInfo_Kills);
 				STAC_SetInfo(client,	STACInfo_Kills,		iOldKills--);
 			}
-			else if(g_iKickLimit > 0 && g_bKarmaAllowKickRemoval)
+			else if(g_iKickLimit > 0 && g_bKarmaKickRemove)
 			{
 				new iOldKicks = STAC_GetInfo(client,	STACInfo_Kicks);
 				STAC_SetInfo(client,	STACInfo_Kicks,		iOldKicks--);
 			}
-			else if(g_iBanLimit > 0 && g_bKarmaAllowBanRemoval)
+			else if(g_iBanLimit > 0 && g_bKarmaBanRemove)
 			{
 				new iOldBans = STAC_GetInfo(client,		STACInfo_Bans);
 				STAC_SetInfo(client,	STACInfo_Bans,	iOldBans--);

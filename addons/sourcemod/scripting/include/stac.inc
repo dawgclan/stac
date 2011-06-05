@@ -34,6 +34,8 @@ enum STACSetting
 	STACSetting_IgnoreBots,
 	STACSetting_Immunity,
 	STACSetting_KarmaEnabled,
+	STACSetting_KarmaBanRemove,
+	STACSetting_KarmaKickRemove,
 	STACSetting_KarmaLimit,
 	STACSetting_KickLimit,
 	STACSetting_KillKarma,
