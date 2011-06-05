@@ -106,6 +106,10 @@ a:hover, a:active, a:focus { /* this group of selectors will give a keyboard nav
 		float: right;
 }
 
+.main {
+	margin: auto;
+}
+
 /* ~~ This grouped selector gives the lists in the .content area space ~~ */
 .content ul, .content ol { 
 	padding: 0 15px 15px 40px; /* this padding mirrors the right padding in the headings and paragraph rule above. Padding was placed on the bottom for space between other elements on the lists and on the left to create the indention. These may be adjusted as you wish. */
