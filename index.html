@@ -1,40 +1,13 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>Source Team Attack Control</title>
-<link href="style.css" rel="stylesheet" type="text/css" /><!--[if lte IE 7]>
-<style>
-.content { margin-right: -1px; } /* this 1px negative margin can be placed on any of the columns in this layout with the same corrective effect. */
-ul.nav a { zoom: 1; }  /* the zoom property gives IE the hasLayout trigger it needs to correct extra whiltespace between the links */
-</style>
-<![endif]-->
-</head>
+---
+layout: default
+title: News
+---
 
-<body>
-
-<div class="container">
-  <div class="header"><a href="index.html">Source Team Attack Control</a> 
-    <!-- end .header --></div>
-  <div class="sidebar1">
-    <ul class="nav">
- 	   <li><a href="index.html">Home</a></li>
-   	   <li><a href="credits.html">Credits</a></li>
-      <li><a href="download.html">Download</a></li>
-      <li><a href="https://github.com/dawgclan/stac/issues" target="_blank">Bug Reports (GitHub)</a></li>
-      <li><a href="#" target="_blank">Forum Thread (SourceMod)</a></li>
-      <li><a href="https://github.com/dawgclan/stac/toggle_watch" target="_blank">Watch Us (GitHub)</a>    <!-- end .sidebar1 --></li>
-    </ul>
-  </div>
-  <div class="content">
-    <h1>What is STAC?</h1>
-    <p>STAC stands for Source Team Attack Control, the name is based on it's predecessor, Advaned Team Attack Control: Source, which was based on IT'S predecessor, Advanced Team Attack Control.</p>
-<h2>Why change the name?</h2>
-    <p>Despite the fact that I, FlyingMongoose am the author of ATAC: Source, and I've had blessings from the old ATAC community to make use of the name, this particular iteration is somewhat of a rewrite of ATAC, utilizing different data storage methods and a much cleaner writing of the code in general. It is also a collaborative effort, with input from Rothgar the writer of the Simple TK Manager, and Tsunami, the lead coder for SourceBans and whom has done a rewrite of ATAC: Source himself. So some fresh faces, some old faces, and a fresh new name. Source Team Attack Control, because you can't be everywhere.</p>
-    <!-- end .content --></div>
-  <div class="footer">
-    <p>Copyright &copy; 2011 Source Team Attack Control</p>
-    <!-- end .footer --></div>
-  <!-- end .container --></div>
-</body>
-</html>
+{% for post in site.posts limit:1 %}
+<h2><a href="{{ post.url }}">{{ post.title }}</a></h2>
+{{ post.content }}
+<em>Posted on {{ post.date | date_to_long_string }}.</em>
+<a href="{{ page.url }}#disqus_thread">View Comments</a>
+<div id="disqus_thread"></div>
+<script type="text/javascript" src="http://disqus.com/forums/sourcetac/embed.js"></script>
+{% endfor %}
