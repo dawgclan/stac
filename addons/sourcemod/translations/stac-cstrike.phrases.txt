@@ -1,0 +1,30 @@
+"Phrases"
+{
+	"Defusing Bomb"
+	{
+		"en"		"defusing the bomb."
+	}
+	"Detonating Bomb"
+	{
+		"en"		"detonating the bomb."
+	}
+	"Planting Bomb"
+	{
+		"en"		"planting the bomb."
+	}
+	"Rescuing Hostage"
+	{
+		"en"		"rescuing a hostage."
+	}
+	"Spawn Attacking"
+	{
+		"#format"	"{1:N},{2:N}"
+		"en"		"{1} has been slayed for spawn attacking {2}."
+		"de"		"{1} wurde erschlagen wegen Spawnattacke an {2}."
+		"fr"		"{1} a t tu(e) massacre au spawn sur {2}."
+	}
+	"Winning Round"
+	{
+		"en"		"winning the round."
+	}
+}
