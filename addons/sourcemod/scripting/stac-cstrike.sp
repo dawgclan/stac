@@ -20,7 +20,7 @@ public Plugin:myinfo	=
  *	Globals
  */
 new g_iSpawnTime[MAXPLAYERS + 1];
-new bool:g_bAllowExplodeEffect;
+new bool:g_bAllowExplodeEffect = false;
 new Handle:g_hBombDefusedKarma;
 new Handle:g_hBombExplodedKarma;
 new Handle:g_hBombPlantedKarma;
