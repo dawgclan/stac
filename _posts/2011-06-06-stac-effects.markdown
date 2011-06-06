@@ -23,8 +23,6 @@ Here is that list of Enumerations.
 * STACEffect_FreezeBomb
 * STACEffect_TimeBomb
 
-	native STAC_Effect(client,STACEffect_Type:type,Float:radius=375.0,ticks=10,targetmode=0,Float:duration=20.0);
-
 Assuming I've placed *#include &lt;stac&gt;* and *#include &lt;stac_effects&gt;* into my plugin I'm good to go.
 
 So, lets say I want to FireBomb a player. It's easy!
