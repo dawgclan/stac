@@ -5,6 +5,7 @@
 
 #undef REQUIRE_PLUGIN
 #include <stac>
+#include <stac_effect>
 
 new Handle:g_hBeacon =			INVALID_HANDLE;
 new Handle:g_hBeaconRadius =	INVALID_HANDLE;
@@ -53,9 +54,9 @@ public APLRes:AskPluginLoad2(Handle:myself, bool:late,String:error[],err_max)
 public Native_GetInfo(Handle:plugin, numParams)
 {
 	new iClient = GetNativeCell(1);
-	if(IsPlayerInGame(iClient)
+	if(IsPlayerInGame(iClient))
 	{
-		CreateBeacon(iClient)
+		CreateBeacon(iClient);
 	}else{
 		ThrowNativeError(SP_ERROR_INDEX,"[STAC] Beacon | Client %d not in game", iClient);
 	}
