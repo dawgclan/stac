@@ -88,8 +88,9 @@ public OnLibraryAdded(const String:name[])
 
 public APLRes:AskPluginLoad2(Handle:myself, bool:late, String:error[], err_max)
 {
-   CreateNative("STACEffect_Explode", Native_STACEffect_Explode);
-   return APLRes_Success;
+	RegPluginLibrary("stac-explode");
+	CreateNative("STACEffect_Explode", Native_STACEffect_Explode);
+	return APLRes_Success;
 }
 
 /**

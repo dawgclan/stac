@@ -116,4 +116,7 @@ public __pl_stac_SetNTVOptional()
 	MarkNativeAsOptional("STAC_GetSetting");
 	MarkNativeAsOptional("STAC_RegisterPunishment");
 	MarkNativeAsOptional("STAC_SetInfo");
+	MarkNativeAsOptional("STAC_OnPlayerDeath");
+	MarkNativeAsOptional("STAC_OnPlayerHurt");
+	MarkNativeAsOptional("STAC_OnPlayerSPawn");
 }

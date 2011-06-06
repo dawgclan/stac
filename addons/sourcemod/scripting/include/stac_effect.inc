@@ -52,7 +52,7 @@ native STACEffect_Burn(client);
  * @noreturn
  * @error	Client not in game
  */
-native STACEffect_Drug(client)
+native STACEffect_Drug(client);
 
 /**
  * Blows up a client
@@ -62,7 +62,7 @@ native STACEffect_Drug(client)
  * @noreturn
  * @error	Client not in game
  */
-native STACEffect_Explode(client)
+native STACEffect_Explode(client);
 
 /**
  * Turns a client into a firebomb
@@ -72,7 +72,7 @@ native STACEffect_Explode(client)
  * @noreturn
  * @error	Client not in game
  */
-native STACEffect_FireBomb(client)
+native STACEffect_FireBomb(client);
 
 /**
  * Freezes a client
@@ -82,7 +82,7 @@ native STACEffect_FireBomb(client)
  * @noreturn
  * @error	Client not in game
  */
-native STACEffect_Freeze(client)
+native STACEffect_Freeze(client);
 
 /**
  * Turns a client into a freezebomb
@@ -92,7 +92,7 @@ native STACEffect_Freeze(client)
  * @noreturn
  * @error	Client not in game
  */
-native STACEffect_FreezeBomb(client)
+native STACEffect_FreezeBomb(client);
 
 /**
  * Turns a client into a timebomb
@@ -102,20 +102,17 @@ native STACEffect_FreezeBomb(client)
  * @noreturn
  * @error	Client not in game
  */
-native STACEffect_TimeBomb(client)
- 
-public SharedPlugin:__pl_stac_effect = 
-{
-	name = "stac_effect",
-	file = "stac_effect.smx",
-	#if defined REQUIRE_PLUGIN
-	required = 1,
-	#else
-	required = 0,
-	#endif
-};
+native STACEffect_TimeBomb(client);
 
 public __pl_stac_effect_SetNTVOptional()
 {
-	MarkNativeAsOptional("STAC_Effect");
+	MarkNativeAsOptional("STACEffect_Beacon");
+	MarkNativeAsOptional("STACEffect_Blind");
+	MarkNativeAsOptional("STACEffect_Burn");
+	MarkNativeAsOptional("STACEffect_Drug");
+	MarkNativeAsOptional("STACEffect_Explode");
+	MarkNativeAsOptional("STACEffect_FireBomb");
+	MarkNativeAsOptional("STACEffect_Freeze");
+	MarkNativeAsOptional("STACEffect_FreezeBomb");
+	MarkNativeAsOptional("STACEffect_TimeBomb");
 }

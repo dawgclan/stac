@@ -20,6 +20,7 @@ public Plugin:myinfo	=
  *	Globals
  */
 new g_iSpawnTime[MAXPLAYERS + 1];
+new bool:g_bAllowExplodeEffect;
 new Handle:g_hBombDefusedKarma;
 new Handle:g_hBombExplodedKarma;
 new Handle:g_hBombPlantedKarma;
@@ -30,11 +31,18 @@ new Handle:g_hMirrorDamageSlap;
 new Handle:g_hRoundWinKarma;
 new	Handle:g_hSpawnProtectTime;
 
+
 /**
  *	Plugin Forwards
  */
 public OnPluginStart()
 {
+	// Load translations
+	LoadTranslations("stac-cstrike.phrases");
+	
+	if(LibraryExists("stac-explode"))
+		OnLibraryAdded("stac-explode");
+	
 	decl String:sGameDir[64];
 	GetGameFolderName(sGameDir,sizeof(sGameDir));
 	if(!StrEqual(sGameDir, "cstrike"))
@@ -57,11 +65,16 @@ public OnPluginStart()
 	HookEvent("bomb_planted",		Event_BombPlanted);
 	HookEvent("hostage_rescued",	Event_HostageRescued);
 	HookEvent("player_hurt",		Event_PlayerHurt);
-	HookEvent("player_spawn",		Event_PlayerSpawn);
 	HookEvent("round_end",			Event_RoundEnd);
 	
-	// Load translations
-	LoadTranslations("stac-cstrike.phrases");
+}
+
+public OnLibraryAdded(const String:name[])
+{
+	if(StrEqual(name, "stac-explode"))
+	{
+		g_bAllowExplodeEffect = true;
+	}	
 }
 
 /**
@@ -142,7 +155,7 @@ public Event_PlayerHurt(Handle:event, const String:name[], bool:dontBroadcast)
 			new iHealth = GetClientHealth(iAttacker);
 			if(iHealth <= 0)
 			{
-				ForcePlayerSuicide(iAttacker);
+				SlayPlayer(iAttacker);
 				return;
 			}
 			if(GetConVarBool(g_hMirrorDamageSlap))
@@ -165,15 +178,15 @@ public Event_PlayerHurt(Handle:event, const String:name[], bool:dontBroadcast)
 		return;
 	
 	PrintToChatAll("%c[STAC]%c %t", CLR_GREEN, CLR_DEFAULT, "Spawn Attacking", iAttacker, iVictim);
-	STAC_Effect(iAttacker,STACEffect_Explode);
+	SlayPlayer(iAttacker);
 }
 
-public Event_PlayerSpawn(Handle:event, const String:name[], bool:dontBroadcast)
+public STAC_OnPlayerSpawn(client)
 {
 	if(!STAC_GetSetting(STACSetting_Enabled))
 		return;
 	
-	g_iSpawnTime[GetClientOfUserId(GetEventInt(event, "userid"))] = GetTime();
+	g_iSpawnTime[client] = GetTime();
 }
 
 public Event_RoundEnd(Handle:event, const String:name[], bool:dontBroadcast)
@@ -196,4 +209,12 @@ public Event_RoundEnd(Handle:event, const String:name[], bool:dontBroadcast)
 		
 		PrintToChat(i, "%c[STAC]%c %t %s", CLR_GREEN, CLR_DEFAULT, "Earned Karma", STAC_GetInfo(i,STACInfo_Karma), STAC_GetSetting(STACSetting_KarmaLimit), sReason);
 	}
+}
+
+SlayPlayer(client)
+{
+	if(g_bAllowExplodeEffect)
+		STACEffect_Explode(client);
+	else
+		ForcePlayerSuicide(client);
 }
