@@ -1,5 +1,5 @@
 ---
-layout: default
+layout: post
 title: STAC 0.5.0 Complete
 author: FlyingMongoose
 ---

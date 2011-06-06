@@ -1,5 +1,5 @@
 ---
-layout: default
+layout: post
 title: STAC Effects Implemented
 author: FlyingMongoose
 ---
