@@ -8,7 +8,7 @@ One thing that made ATAC, and it's alternatives (such as Rothgar's Simple Anti-T
 
 Well, STAC is no different, while we have yet to actually write the plugins that provide these "fun" options, I have been hard at work porting some of the functionality over.
 
-With STAC we are attempting to be as dynamic and versatile as possible, doing so means utilizing a lot of natives. That being the case I have taken the time to build a special include file that can be used by any plugin meant to work with ATAC.
+With STAC we are attempting to be as dynamic and versatile as possible, doing so means utilizing a lot of natives. That being the case I have taken the time to build a special include file that can be used by any plugin meant to work with STAC.
 
 While a number of these functionalities do not work in all mods, we will do our best to update to make them do so, the nice thing I have done here is made just **ONE** function, with a list of enumerations as the effect option.
 
