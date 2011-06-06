@@ -56,4 +56,6 @@ See? Wasn't that easy, but wait, I want the bomb to affect a larger radius, lets
 See? Wasn't that easy? The 600.0 is the radius, the 10 is the number of seconds that it takes for the bomb to "go off" this is optional you can leave it "empty" and it will default to 10 anyway, the 2 is the target mode (allowing it to burn everyone within the 600 radius), and the 10.0 is how long the burn will last (on each player).
 
 With this advent it will make building the punishment plugins (and a couple of the mod-plugins) go a LOT faster.
+
+I'm sure some of you are wondering "Where is Uber-Slap?" well that particular function is rather touchy, however it's not going to go in until we're done with all the other punishments. At which point it will be added to the enums available above and I also intend to build an "UberSlap Bomb".
 	
