@@ -20,7 +20,7 @@ ul.nav a { zoom: 1; }  /* the zoom property gives IE the hasLayout trigger it ne
     <h1>Post</h1>
     <div style="width: 100%; border: 1px solid; height: 0;"></div>
     <div class="main">
-    <h2>{{ page.title}}</h2>
+    <h2><a href="{{ page.url }}">{{ page.title}}</a></h2>
     {{ content }}
     </div>
     <!-- end .content --></div>
