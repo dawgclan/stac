@@ -6,5 +6,5 @@ title: News
 {% for post in site.posts limit:3 %}
 <h2><u>{{ post.title }}</u></h2>
 {{ post.content }}
-<em style="margin-left: 5px;">Posted on {{ post.date | date_to_long_string }}.</em>
+<em style="margin-left: 5px;">Posted on {{ post.date | date_to_long_string }} by {{ post.author }}.</em>
 {% endfor %}
