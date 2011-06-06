@@ -12,25 +12,25 @@ ul.nav a { zoom: 1; }  /* the zoom property gives IE the hasLayout trigger it ne
 </head>
 
 <body>
-
+<div class="bigcontainer">
+<div class="header"><a href="{{ site.url }}">Source Team Attack Control</a> 
+<!-- end .header --></div>
 <div class="container">
-  <div class="header"><a href="{{ site.url }}">Source Team Attack Control</a> 
-    <!-- end .header --></div>
   <div class="content">
     <h1>{{ page.title}}</h1>
     <div style="width: 100%; border: 1px solid; height: 0;"></div>
     <div class="main">
     {{ content }}
-    <div id="disqus_thread" style="padding-left: 10px !important; width: 80% !important;"></div>
-	<script type="text/javascript" src="http://disqus.com/forums/sourcetac/embed.js"></script>
-	</div>
+    </div>
     <!-- end .content --></div>
+  <!-- end .container --></div>
   <div class="sidebar1">
     <ul class="nav">
  	  <li><a href="{{ site.url }}">News</a></li>
  	  <li><a href="{{ site.url }}/about">About</a></li>
    	  <li><a href="{{ site.url }}/credits">Credits</a></li>
-      <li><a href="{{ site.url }}/download">Download</a></li>      <li><a href="https://github.com/dawgclan/stac/issues" target="_blank">Bug Reports (GitHub)</a></li>
+      <li><a href="{{ site.url }}/download">Download</a></li>
+      <li><a href="https://github.com/dawgclan/stac/issues" target="_blank">Bug Reports (GitHub)</a></li>
       <li><a href="#" target="_blank">Forum Thread (SourceMod)</a></li>
       <li><a href="https://github.com/dawgclan/stac/toggle_watch" target="_blank">Watch Us (GitHub)</a>    <!-- end .sidebar1 --></li>
     </ul>
@@ -38,6 +38,6 @@ ul.nav a { zoom: 1; }  /* the zoom property gives IE the hasLayout trigger it ne
   <div class="footer">
     <p>Copyright &copy; 2011 Source Team Attack Control</p>
     <!-- end .footer --></div>
-  <!-- end .container --></div>
+</div>
 </body>
 </html>
