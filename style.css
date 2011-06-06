@@ -84,11 +84,11 @@ a:hover, a:active, a:focus { /* this group of selectors will give a keyboard nav
 */
 .sidebar1 {
 	float: right;
-	display: block;
-	width: 100%;
+	width: 20%;
+	height: 100%;
 	background: #93A5C4;
 	padding-bottom: 0;
-		
+	
 }
 
 .content {
@@ -111,16 +111,12 @@ a:hover, a:active, a:focus { /* this group of selectors will give a keyboard nav
 
 /* ~~ The navigation list styles (can be removed if you choose to use a premade flyout menu like Spry) ~~ */
 ul.nav {
-	list-style-type: none;
 	list-style: none; /* this removes the list marker */
-	border-left: 1px solid #666; /* this creates the top border for the links - all others are placed using a bottom border on the LI */
-	padding: 0;
-	margin: 0; /* this creates the space between the navigation on the content below */
+	border-top: 1px solid #666; /* this creates the top border for the links - all others are placed using a bottom border on the LI */
+	margin-bottom: 0; /* this creates the space between the navigation on the content below */
 }
 ul.nav li {
-	float: left;
-	border-right: 1px solid #666; /* this creates the button separation */
-	display: inline;
+	border-bottom: 1px solid #666; /* this creates the button separation */
 }
 ul.nav a, ul.nav a:visited { /* grouping these selectors makes sure that your links retain their button look even after being visited */
 	padding: 5px 5px 5px 15px;
