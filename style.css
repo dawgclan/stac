@@ -104,9 +104,12 @@ a:hover, a:active, a:focus { /* this group of selectors will give a keyboard nav
 	float: left;
 }
 
-.main {
+.post {
 	padding-top: 20px;
 	border-top: solid 1px #000;
+}
+
+.main {
 	margin: 15px;
 	background-color: #fff;
 }
