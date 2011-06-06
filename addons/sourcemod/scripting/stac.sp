@@ -1,8 +1,8 @@
 // To Do
-/*
-Removal of ClientPref Cookies
-Evaluation of loghelper.inc requirement
-*/
+/**
+ * ClientPref Cookie Purging (Not Implemented Into SourceMod Yet)
+ * Evaluation of loghelper.inc requirement
+ */
 
 #pragma semicolon 1
 
@@ -75,8 +75,8 @@ new Handle:g_hEnabled =							INVALID_HANDLE;
 new Handle:g_hIgnoreBots =						INVALID_HANDLE;
 new Handle:g_hImmunity =						INVALID_HANDLE;
 new Handle:g_hKarmaEnabled =					INVALID_HANDLE;
-new Handle:g_hKarmaBanRemove =				INVALID_HANDLE;
-new Handle:g_hKarmaKickRemove = 			INVALID_HANDLE;
+new Handle:g_hKarmaBanRemove =					INVALID_HANDLE;
+new Handle:g_hKarmaKickRemove = 				INVALID_HANDLE;
 new Handle:g_hKarmaLimit =						INVALID_HANDLE;
 new Handle:g_hKickLimit =						INVALID_HANDLE;
 new Handle:g_hKillKarma =						INVALID_HANDLE;
