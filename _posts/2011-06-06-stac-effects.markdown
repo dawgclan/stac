@@ -22,38 +22,12 @@ Here is that list of Enumerations.
 * STACEffect_Freeze
 * STACEffect_FreezeBomb
 * STACEffect_TimeBomb
-<pre><code>/**
- * Executes an explosion effect on the client
- *
- * @param	client		Player index
- * @param	type		STACEffects_Type
- * @param	radius		Optional param that allows a Float to be passed
- * 						for radii of functions (such as bombs and beacon)
- *						Default = 375.0
- * @param	ticks		Optional param that allows an int to be passed for customizable timers
- * 						such as in FireBomb, and TimeBomb.
- *						Default = 10
- * @param	targetmode	Optional param that allows you to set the mode of a bomb
- *						0 = Target Only
- *						1 = Target Team Mates and Target
- *						2 = Everyone
- * @param	duration	Optional param that allows an amount of time before an effect wears off
- *						such as "Freeze", "FreezeBomb", and "Burn"
- *						Default = 20.0
- *
- * @noreturn
- * @error				Client not in game.
- */
-native STAC_Effect(client,STACEffect_Type:type,Float:radius=375.0,ticks=10,targetmode=0,Float:duration=20.0);</code></pre>
-Assuming I've placed <em>#include <stac></em> and <em>#include <stac_effects></em> into my plugin I'm good to go.
+	native STAC_Effect(client,STACEffect_Type:type,Float:radius=375.0,ticks=10,targetmode=0,Float:duration=20.0);
+Assuming I've placed *#include <stac>* and *#include <stac_effects>* into my plugin I'm good to go.
 So, lets say I want to FireBomb a player. It's easy!
-<pre><code>// Client = player index
-STAC_Effect(client, STACEffect_FireBomb);
-</code></pre>
+	STAC_Effect(client, STACEffect_FireBomb);
 See? Wasn't that easy, but wait, I want the bomb to affect a larger radius, lets say 600, and only want it to burn for 10 seconds, and affect EVERYONE. Simple.
-<pre><code>// Client = player index
-STAC_Effect(client, STACEffect_FireBomb, 600.0,10,2,10.0);
-</code></pre>
+	STAC_Effect(client, STACEffect_FireBomb, 600.0,10,2,10.0);
 See? Wasn't that easy? The 600.0 is the radius, the 10 is the number of seconds that it takes for the bomb to "go off" this is optional you can leave it "empty" and it will default to 10 anyway, the 2 is the target mode (allowing it to burn everyone within the 600 radius), and the 10.0 is how long the burn will last (on each player).
 
 With this advent it will make building the punishment plugins (and a couple of the mod-plugins) go a LOT faster.
