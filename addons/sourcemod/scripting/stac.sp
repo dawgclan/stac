@@ -92,7 +92,10 @@ new Handle:g_hPurgeTime =						INVALID_HANDLE;
 new Handle:g_hSpawnPunishDelay = 				INVALID_HANDLE;
 new Handle:g_hSpawnPunishment[MAXPLAYERS + 1] =	{INVALID_HANDLE, ...};
 new Mod:g_iMod = Mod_Default;
-
+// Foward handles
+new Handle:g_hOnPlayerDeath;
+new Handle:g_hOnPlayerHurt;
+new Handle:g_hOnPlayerSpawn;
 
 // Log File Functions
 BuildLogFilePath()
@@ -195,6 +198,7 @@ public APLRes:AskPluginLoad2(Handle:myself, bool:late,String:error[],err_max)
 	CreateNative("STAC_GetSetting",			Native_GetSetting);
 	CreateNative("STAC_RegisterPunishment",	Native_RegisterPunishment);
 	CreateNative("STAC_Setinfo",			Native_SetInfo);
+	CreateNative("STAC_PrintAll",		Native_PrintAll);
 	
 	return APLRes_Success;
 }	
@@ -323,6 +327,8 @@ public OnPluginStart()
 	
 	AutoExecConfig(true, "stac");
 
+	CreateForwards();
+	
 	// Purge Old Log Files
 	if (g_hLogDays != INVALID_HANDLE)
 	{
@@ -516,6 +522,11 @@ public Event_PlayerDeath(Handle:event, const String:name[], bool:dontBroadcast)
 	new iAttacker	=	GetClientOfUserId(GetEventInt(event, "attacker")),
 		iVictim	=	GetClientOfUserId(GetEventInt(event, "userid"));
 		
+	Call_StartForward(g_hOnPlayerDeath);
+	Call_PushCell(iAttacker);
+	Call_PushCell(iVictim);
+	Call_Finish();
+	
 	// if ATAC is Disables, no TK limit, attacker is world, or self damage ignore
 	if(!g_bEnabled || !g_iKillLimit || !iAttacker || iAttacker == iVictim)
 		return;
@@ -549,7 +560,12 @@ public Event_PlayerHurt(Handle:event, const String:name[], bool:dontBroadcast)
 {
 	new iAttacker	=	GetClientOfUserId(GetEventInt(event, "attacker")),
 		iVictim		=	GetClientOfUserId(GetEventInt(event, "userid"));
-		
+	
+	Call_StartForward(g_hOnPlayerHurt);
+	Call_PushCell(iAttacker);
+	Call_PushCell(iVictim);
+	Call_Finish();
+	
 	// If disabled, there is no TA Limit, the attacker is the world, or the same as the victim, or if the players are on opposing teams ignore
 	if(!g_bEnabled || !g_iAttackLimit || !iAttacker || iAttacker == iVictim || GetClientTeam(iAttacker) != GetClientTeam(iVictim))
 		return;
@@ -572,6 +588,9 @@ public Event_PlayerHurt(Handle:event, const String:name[], bool:dontBroadcast)
 public Event_PlayerSpawn(Handle:event, const String:name[], bool:dontBroadcast)
 {
 	new iClient = GetClientOfUserId(GetEventInt(event, "userid"));
+	Call_StartForward(g_hOnPlayerSpawn);
+	Call_PushCell(iClient);
+	Call_Finish();
 
 	if (g_bEnabled)
 	{
@@ -707,6 +726,50 @@ public Action:Timer_SpawnPunishment(Handle:timer, any:client)
 /**
  *	Natives
  */
+public Native_PrintAll(Handle:plugin, numParams)
+{
+	new iClient = GetNativeCell(1);
+	new iOutput1Length;
+	GetNativeStringLength(3,iOutput1Length);
+	decl String:sOutput1[iOutput1Length];
+	GetNativeString(3,sOutput1,iOutput1Length);
+	
+	decl String:sOutputFinal[256];
+	
+	new iMin, iMax;
+	if(GetNativeCell(2) == STACInfo_Attacks)
+	{
+		iMin = STAC_GetInfo(iClient, STACInfo_Attacks);
+		iMin = STAC_GetSetting(STACSetting_AttackLimit);
+		Format(sOutputFinal, sizeof(sOutputFinal), "%c[STAC]%c %s %t", sOutput1, "Has Karma Left", iMin, iMax);
+	}
+	else if(GetNativeCell(2) == STACInfo_Attacks)
+	{
+		iMin = STAC_GetInfo(iClient, STACInfo_Attacks);
+		iMin = STAC_GetSetting(STACSetting_AttackLimit);
+		Format(sOutputFinal, sizeof(sOutputFinal), "%c[STAC]%c %s %t", sOutput1, "Has Attacks Left", iMin, iMax);
+	}
+	else if(GetNativeCell(2) == STACInfo_Kicks)
+	{
+		iMin = STAC_GetInfo(iClient, STACInfo_Kills);
+		iMin = STAC_GetSetting(STACSetting_KillLimit);
+		Format(sOutputFinal, sizeof(sOutputFinal), "%c[STAC]%c %s %t", sOutput1, "Has Kills Left", iMin, iMax);
+	}
+	else if(GetNativeCell(2) == STACInfo_Kicks)
+	{
+		iMin = STAC_GetInfo(iClient, STACInfo_Kicks);
+		iMin = STAC_GetSetting(STACSetting_KickLimit);
+		Format(sOutputFinal, sizeof(sOutputFinal), "%c[STAC]%c %s %t", sOutput1, "Has Kicks Left", iMin, iMax);
+	}
+	else if(GetNativeCell(2) == STACInfo_Bans)
+	{
+		iMin = STAC_GetInfo(iClient, STACInfo_Bans);
+		iMin = STAC_GetSetting(STACSetting_BanLimit);
+		Format(sOutputFinal, sizeof(sOutputFinal), "%c[STAC]%c %s %t", sOutput1, "Has Bans Left", iMin, iMax);
+	}
+	PrintToChatAll(sOutputFinal);
+}
+ 
 public Native_GetInfo(Handle:plugin, numParams)
 {
 	new iClient = GetNativeCell(1);
@@ -864,7 +927,7 @@ CheckInfo(client)
 		if(iBans >= g_iBanLimit)
 		{
 			decl String:sReason[256];
-			Format(sReason, sizeof(sReason), "[ATAC] %t", "Ban Reason", client);
+			Format(sReason, sizeof(sReason), "[STAC] %t", "Ban Reason", client);
 			if(IsClientInGame(client))
 			{
 				if(!g_iBanType)
@@ -996,4 +1059,11 @@ ResetClientPrefs(client)
 		SetClientCookie(client,	g_hKicks,	"0");
 		SetClientCookie(client,	g_hKills,	"0");
 	}
+}
+
+CreateForwards()
+{
+	g_hOnPlayerDeath		= 	CreateGlobalForward("STAC_OnPlayerDeath",ET_Ignore,Param_Cell);
+	g_hOnPlayerHurt			=	CreateGlobalForward("STAC_OnPlayerHurt",ET_Ignore,Param_Cell);
+	g_hOnPlayerSpawn		=	CreateGlobalForward("STAC_OnPlayerSpawn",ET_Ignore,Param_Cell);
 }

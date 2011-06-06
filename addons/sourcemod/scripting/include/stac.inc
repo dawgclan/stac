@@ -81,6 +81,23 @@ native STAC_RegisterPunishment(const String:name[], STACPunishment:callback);
  */
 native STAC_SetInfo(client, STACInfo:type, value);
 
+/**
+ * When a player dies
+ *
+ */
+forward STAC_OnPlayerDeath(attacker,victim);
+
+/**
+ * When a player is hurt
+ *
+ */
+forward STAC_OnPlayerHurt(attacker,victim);
+
+/**
+ * When a player spawns
+ *
+ */
+forward STAC_OnPlayerSpawn(client);
 
 public SharedPlugin:__pl_stac = 
 {
