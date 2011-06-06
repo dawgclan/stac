@@ -1,7 +1,6 @@
 ---
 layout: default
 title: STAC 0.5.0 Complete
-author: FlyingMongoose
 ---
 
 The Base to STAC is complete. (0.5.0)
