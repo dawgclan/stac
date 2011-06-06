@@ -51,7 +51,7 @@ public APLRes:AskPluginLoad2(Handle:myself, bool:late,String:error[],err_max)
 	CreateNative("STACEffect_Beacon",			Native_SEBeacon);
 }
 
-public Native_GetInfo(Handle:plugin, numParams)
+public Native_SEBeacon(Handle:plugin, numParams)
 {
 	new iClient = GetNativeCell(1);
 	if(IsPlayerInGame(iClient))
