@@ -23,7 +23,7 @@ Here is that list of Enumerations.
 * STACEffect_FreezeBomb
 * STACEffect_TimeBomb
 	native STAC_Effect(client,STACEffect_Type:type,Float:radius=375.0,ticks=10,targetmode=0,Float:duration=20.0);
-Assuming I've placed *#include <stac>* and *#include <stac_effects>* into my plugin I'm good to go.
+Assuming I've placed #include <stac> and #include <stac_effects> into my plugin I'm good to go.
 So, lets say I want to FireBomb a player. It's easy!
 	STAC_Effect(client, STACEffect_FireBomb);
 See? Wasn't that easy, but wait, I want the bomb to affect a larger radius, lets say 600, and only want it to burn for 10 seconds, and affect EVERYONE. Simple.
