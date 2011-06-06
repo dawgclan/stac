@@ -22,9 +22,8 @@ ul.nav a { zoom: 1; }  /* the zoom property gives IE the hasLayout trigger it ne
     <div class="main">
     <h2>{{ page.title }}</h2>
     {{ content }}
-    <hr style="height: 0px; border: solid 1px 0px 0px 0px #000; width: 100%" />
     <em style="margin-left: 5px; float: left">Posted on {{ page.date | date_to_long_string }} by <a href="https://github.com/{{ age.author }}" target="_blank">{{ page.author }}</a>.</em>
-    <div id="disqus_thread"></div>
+    <div id="disqus_thread" style="border-top: 1px solid #000; width: 100%;"></div>
 	<script type="text/javascript" src="http://disqus.com/forums/sourcetac/embed.js"></script>
     </div>
     <!-- end .content --></div>
