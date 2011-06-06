@@ -5,6 +5,7 @@
 
 #undef REQUIRE_PLUGIN
 #include <stac>
+#tryinclude <stac-effect>
 
 new Handle:g_hBeacon =			INVALID_HANDLE;
 new Handle:g_hBeaconRadius =	INVALID_HANDLE;
@@ -42,6 +43,8 @@ public OnLibraryAdded(const String:name[])
 	Format(sName, sizeof(sName), "%T", "Beacon", LANG_SERVER);
 	STAC_RegisterPunishment(sName, STACPunishment_Beacon);
 }
+
+#if defined __stac_effect_included_
 //////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -50,12 +53,12 @@ public APLRes:AskPluginLoad2(Handle:myself, bool:late,String:error[],err_max)
 	CreateNative("STACEffect_Beacon",			Native_SEBeacon);
 }
 
-public Native_GetInfo(Handle:plugin, numParams)
+public Native_SEBeacon(Handle:plugin, numParams)
 {
 	new iClient = GetNativeCell(1);
-	if(IsPlayerInGame(iClient)
+	if (IsClientInGame(iClient))
 	{
-		CreateBeacon(iClient)
+		CreateBeacon(iClient);
 	}else{
 		ThrowNativeError(SP_ERROR_INDEX,"[STAC] Beacon | Client %d not in game", iClient);
 	}
@@ -63,6 +66,33 @@ public Native_GetInfo(Handle:plugin, numParams)
 //////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////
+#endif
+
+/**
+ *	Punishments Variables
+ */
+
+// Sounds (based off funcommands.sp)
+#define SOUND_BLIP		"buttons/blip1.wav"
+
+// Flags used in various timers
+#define DEFAULT_TIMER_FLAGS TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE
+
+// Serial Generator for Timer Safety
+new g_Serial_Gen = 0;
+
+// Model indexes for temp entities (based off funcommands.sp)
+new g_BeamSprite;
+new g_HaloSprite;
+
+// Basic color arrays for temp entities (based off funcommands.sp)
+new redColor[4] = {255, 75, 75, 255};
+new greenColor[4] = {75, 255, 75, 255};
+new blueColor[4] = {75, 75, 255, 255};
+new greyColor[4] = {128, 128, 128, 255};
+
+// Include Punishments (based off funcommands.sp slightly modified)
+new g_BeaconSerial[MAXPLAYERS+1] = { 0, ... };
 
 /**
  *	STAC Punishments
@@ -78,18 +108,7 @@ public STACPunishment_Beacon(victim, attacker)
 	}
 }
 
-// Model indexes for temp entities (based off funcommands.sp)
-new g_BeamSprite;
-new g_HaloSprite;
 
-// Basic color arrays for temp entities (based off funcommands.sp)
-new redColor[4] = {255, 75, 75, 255};
-new greenColor[4] = {75, 255, 75, 255};
-new blueColor[4] = {75, 75, 255, 255};
-new greyColor[4] = {128, 128, 128, 255};
-
-// Include Punishments (based off funcommands.sp slightly modified)
-new g_BeaconSerial[MAXPLAYERS+1] = { 0, ... };
 
 CreateBeacon(client)
 {

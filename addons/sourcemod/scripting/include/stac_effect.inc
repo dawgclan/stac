@@ -3,6 +3,15 @@
 #endif
 #define __stac_effect_included_
 
+#define CLR_DEFAULT		1
+#define CLR_LIGHTGREEN	3
+#define CLR_GREEN		4
+#define CLR_DARKGREEN	5
+
+#define STAC_VERSION	"0.5.0"
+#define STAC_AUTHORS	"Rothgar, Tsunami, FlyingMongoose"
+#define STAC_WEBSITE	"http://dawgclan.github.com/stac"
+
 functag public STAC_Effect(Handle:plugin, numParams);
 
 enum STACEffect_Type
