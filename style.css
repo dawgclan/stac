@@ -117,6 +117,7 @@ ul.nav {
 }
 ul.nav li {
 	border-bottom: 1px solid #666; /* this creates the button separation */
+	display: inline;
 }
 ul.nav a, ul.nav a:visited { /* grouping these selectors makes sure that your links retain their button look even after being visited */
 	padding: 5px 5px 5px 15px;
