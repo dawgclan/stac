@@ -22,17 +22,19 @@ Here is that list of Enumerations.
 * STACEffect_Freeze
 * STACEffect_FreezeBomb
 * STACEffect_TimeBomb
+
 	native STAC_Effect(client,STACEffect_Type:type,Float:radius=375.0,ticks=10,targetmode=0,Float:duration=20.0);
+
 Assuming I've placed *#include &lt;stac&gt;* and *#include &lt;stac_effects&gt;* into my plugin I'm good to go.
 
 So, lets say I want to FireBomb a player. It's easy!
 
 	STAC_Effect(client, STACEffect_FireBomb);
-	
+
 See? Wasn't that easy, but wait, I want the bomb to affect a larger radius, lets say 600, and only want it to burn for 10 seconds, and affect EVERYONE. Simple.
 
 	STAC_Effect(client, STACEffect_FireBomb, 600.0,10,2,10.0);
-	
+
 See? Wasn't that easy? The 600.0 is the radius, the 10 is the number of seconds that it takes for the bomb to "go off" this is optional you can leave it "empty" and it will default to 10 anyway, the 2 is the target mode (allowing it to burn everyone within the 600 radius), and the 10.0 is how long the burn will last (on each player).
 
 With this advent it will make building the punishment plugins (and a couple of the mod-plugins) go a LOT faster.
