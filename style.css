@@ -39,6 +39,10 @@ a:hover, a:active, a:focus { /* this group of selectors will give a keyboard nav
 	text-decoration: none;
 }
 
+.bigcontainer
+{
+	background: #fff;
+}
 /* ~~ this container surrounds all other divs giving them their percentage-based width ~~ */
 .container {
 	float: left;
