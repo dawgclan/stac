@@ -54,7 +54,7 @@ public APLRes:AskPluginLoad2(Handle:myself, bool:late,String:error[],err_max)
 public Native_SEBeacon(Handle:plugin, numParams)
 {
 	new iClient = GetNativeCell(1);
-	if(IsPlayerInGame(iClient))
+	if(IsClientInGame(iClient))
 	{
 		CreateBeacon(iClient);
 	}else{
