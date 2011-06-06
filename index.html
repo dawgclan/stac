@@ -6,5 +6,6 @@ title: News
 {% for post in site.posts limit:3 %}
 <h2><a href="/stac{{ post.url }}">{{ post.title }}</a></h2>
 {{ post.content }}
-<em style="margin-left: 5px;">Posted on {{ post.date | date_to_long_string }} by <a href="https://github.com/{{ post.author }}" target="_blank">{{ post.author }}</a>.</em>
+<em style="margin-left: 5px; float: left">Posted on {{ post.date | date_to_long_string }} by <a href="https://github.com/{{ post.author }}" target="_blank">{{ post.author }}</a>.</em>
+<em style="margin-right: 5px; float: right"><a href="/stac{{ post.url }}#disqus_thread">View Comments</a>
 {% endfor %}
