@@ -1,10 +1,11 @@
 #pragma semicolon 1
 
+
 #include <sourcemod>
 #include <sdktools>
 
 #undef REQUIRE_PLUGIN
-#include <stac>
+#tryinclude <stac>
 #tryinclude <stac-effect>
 
 new Handle:g_hBeacon =			INVALID_HANDLE;
@@ -26,14 +27,17 @@ public OnPluginStart()
 {
 	// Load Translations
 	LoadTranslations("stac-beacon.phrases");
-	
+
+#if defined _stac_included_
 	if(LibraryExists("stac"))
 		OnLibraryAdded("stac");
+#endif
 
 	g_hBeacon =			CreateConVar("stac_beacon", "1", "Is the STAC Beacon option enabled or disabled? [0 = DISABLED, 1 = ENABLED]", 0, true, 0.0, true, 1.0);
 	g_hBeaconRadius =	CreateConVar("stac_beacon_radius", "375.0", "STAC Beacon radius for light rings.", 0, true, 50.0, true, 1500.0);
 }
 
+#if defined _stac_included_
 public OnLibraryAdded(const String:name[])
 {
 	if(!StrEqual(name, "stac"))
@@ -43,6 +47,7 @@ public OnLibraryAdded(const String:name[])
 	Format(sName, sizeof(sName), "%T", "Beacon", LANG_SERVER);
 	STAC_RegisterPunishment(sName, STACPunishment_Beacon);
 }
+#endif
 
 #if defined __stac_effect_included_
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -69,7 +74,7 @@ public Native_SEBeacon(Handle:plugin, numParams)
 #endif
 
 /**
- *	Punishments Variables
+ *	Punishment Variables
  */
 
 // Sounds (based off funcommands.sp)
@@ -95,20 +100,8 @@ new greyColor[4] = {128, 128, 128, 255};
 new g_BeaconSerial[MAXPLAYERS+1] = { 0, ... };
 
 /**
- *	STAC Punishments
+ *	Punishment Functions
  */
-
-public STACPunishment_Beacon(victim, attacker)
-{
-	PrintToChatAll("%c[STAC]%c %t", CLR_GREEN, CLR_DEFAULT, "Beaconed", STAC_GetInfo(attacker, STACInfo_Kills), STAC_GetSetting(STACSetting_KillLimit));
-
-	if (g_BeaconSerial[attacker] == 0)
-	{
-		CreateBeacon(attacker);
-	}
-}
-
-
 
 CreateBeacon(client)
 {
@@ -177,4 +170,18 @@ public Action:Timer_Beacon(Handle:timer, any:value)
 	EmitAmbientSound(SOUND_BLIP, vec, client, SNDLEVEL_RAIDSIREN);	
 
 	return Plugin_Continue;
+}
+
+/**
+ *	STAC Punishment
+ */
+
+public STACPunishment_Beacon(victim, attacker)
+{
+	PrintToChatAll("%c[STAC]%c %t", CLR_GREEN, CLR_DEFAULT, "Beaconed", STAC_GetInfo(attacker, STACInfo_Kills), STAC_GetSetting(STACSetting_KillLimit));
+
+	if (g_BeaconSerial[attacker] == 0)
+	{
+		CreateBeacon(attacker);
+	}
 }
