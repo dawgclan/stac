@@ -105,6 +105,7 @@ a:hover, a:active, a:focus { /* this group of selectors will give a keyboard nav
 }
 
 .main {
+	border-top: solid 1px #000;
 	margin: 15px;
 	background-color: #fff;
 }
