@@ -2,7 +2,7 @@
 body {
 	font: 100%/1.4 Verdana, Arial, Helvetica, sans-serif;
 	background: #4E5869;
-	margin: 0px 100px 0px 100px;
+	margin: 0px 10px;
 	padding: 0;
 	color: #000;
 }
@@ -42,6 +42,7 @@ a:hover, a:active, a:focus { /* this group of selectors will give a keyboard nav
 .bigcontainer
 {
 	background: #fff;
+	width: 90%;
 }
 /* ~~ this container surrounds all other divs giving them their percentage-based width ~~ */
 .container {
@@ -93,6 +94,7 @@ a:hover, a:active, a:focus { /* this group of selectors will give a keyboard nav
 	height: 100%;
 	background: #93A5C4;
 	padding-bottom: 0;
+	position: fixed;
 	
 }
 
