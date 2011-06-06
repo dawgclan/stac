@@ -34,7 +34,8 @@ public Plugin:myinfo =
 enum Mod
 {
 	Mod_Default,
-	Mod_Insurgency
+	Mod_Insurgency,
+	Mod_ZPS
 }
 /**
 *	Arrays
@@ -294,10 +295,16 @@ public OnPluginStart()
 	decl String:sBuffer[65];
 	GetGameFolderName(sBuffer, sizeof(sBuffer));
 	
-	if(StrContains(sBuffer, "insurgency", false) != -1 )
+	if (StrContains(sBuffer, "insurgency", false) != -1 )
 	{
 		g_iMod = Mod_Insurgency;
-	}else{
+	}
+	else if (strcmp(sBuffer, "ZPS", false) == 0)
+	{
+		g_iMod = Mod_ZPS;
+	}
+	else
+	{
 		GetGameDescription(sBuffer,	sizeof(sBuffer));
 		
 		if(StrContains(sBuffer, "Insurgency", false) != -1)
