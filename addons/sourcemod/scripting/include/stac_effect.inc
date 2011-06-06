@@ -41,7 +41,7 @@ enum STACEffect_Type
  * @noreturn
  * @error				Client not in game.
  */
-native STAC_Effect(client,STACEffect_Type:type,Float:radius=375.0,ticks=10,targetmode=0,Float:duration:20.0);
+native STAC_Effect(client,STACEffect_Type:type,Float:radius=375.0,ticks=10,targetmode=0,Float:duration=20.0);
 
 
 public SharedPlugin:__pl_stac_effect = 
