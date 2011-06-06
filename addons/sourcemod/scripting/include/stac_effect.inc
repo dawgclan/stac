@@ -1,13 +1,12 @@
-//#if defined __stac_effect_included_
-//  #endinput
-//#endif
-//#define __stac_effect_included_
+#if defined __stac_effect_included_
+  #endinput
+#endif
+#define __stac_effect_included_
 
 functag public STAC_Effect(Handle:plugin, numParams);
 
 enum STACEffect_Type
 {
-	STACEffect_Beacon,
 	STACEffect_Blind,
 	STACEffect_Burn,
 	STACEffect_Drug,
@@ -43,7 +42,16 @@ enum STACEffect_Type
  */
 native STAC_Effect(client,STACEffect_Type:type,Float:radius=375.0,ticks=10,targetmode=0,Float:duration=20.0);
 
-
+/**
+ * Executes a beacon on the client
+ *
+ * @param	client
+ *
+ * @noreturn
+ * @error	Client not in game.
+ */
+native STACEffect_Beacon(client);
+ 
 public SharedPlugin:__pl_stac_effect = 
 {
 	name = "stac_effect",

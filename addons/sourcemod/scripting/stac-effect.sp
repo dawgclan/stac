@@ -12,7 +12,7 @@
 #include <sourcemod>
 #include <sdktools>
 #include <stac>
-#include <stac_effect>
+#include <se_beacon>
 
 // Sounds
 #define SOUND_BLIP		"buttons/blip1.wav"
