@@ -13,35 +13,37 @@
 
 	<body>
 		<div class="bigcontainer">
-		<div class="header"><a href="{{ site.url }}">Source Team Attack Control</a> 
-		<!-- end .header --></div>
-		<div style="float: none; background: #93A5C4">
-			<div class="container">
-				<div class="content">
-					<h1>Post</h1>
-					<div class="main">
-						<div class="post">
-							<h2>{{ page.title }}</h2>
-							{{ content }}
-							<em style="margin-left: 5px; float: left">Posted on {{ page.date | date_to_long_string }} by <a href="https://github.com/{{ age.author }}" target="_blank">{{ page.author }}</a>.</em>
-							<br /><br />
+			<div class="header"><a href="{{ site.url }}">Source Team Attack Control</a> 
+			<!-- end .header --></div>
+			<div style="float: none; background: #93A5C4">
+				<div class="container">
+					<div class="content">
+						<h1>Post</h1>
+						<div class="main">
+							<div class="post">
+								<h2>{{ page.title }}</h2>
+								{{ content }}
+								<em style="margin-left: 5px; float: left">Posted on {{ page.date | date_to_long_string }} by <a href="https://github.com/{{ age.author }}" target="_blank">{{ page.author }}</a>.</em>
+								<br /><br />
+							</div>
+							<div id="disqus_thread" style="border-top: 1px solid #000; width: 100%;"></div>
+							<script type="text/javascript" src="http://disqus.com/forums/sourcetac/embed.js"></script>
 						</div>
-						<div id="disqus_thread" style="border-top: 1px solid #000; width: 100%;"></div>
-						<script type="text/javascript" src="http://disqus.com/forums/sourcetac/embed.js"></script>
+					<!-- end .content --></div>
+				<!-- end .container --></div>
+					<div class="sidebar1">
+						<ul class="nav">
+							<li><a href="{{ site.url }}">News</a></li>
+							<li><a href="{{ site.url }}/about">About</a></li>
+							<li><a href="{{ site.url }}/credits">Credits</a></li>
+							<li><a href="{{ site.url }}/download">Download</a></li>
+							<li><a href="https://github.com/dawgclan/stac/issues" target="_blank">Bug Reports (GitHub)</a></li>
+							<li><a href="#" target="_blank">Forum Thread (SourceMod)</a></li>
+							<li><a href="https://github.com/dawgclan/stac/toggle_watch" target="_blank">Watch Us (GitHub)</a>    <!-- end .sidebar1 --></li>
+						</ul>
 					</div>
-				<!-- end .content --></div>
-			<!-- end .container --></div>
-			<div class="sidebar1">
-				<ul class="nav">
-					<li><a href="{{ site.url }}">News</a></li>
-					<li><a href="{{ site.url }}/about">About</a></li>
-					<li><a href="{{ site.url }}/credits">Credits</a></li>
-					<li><a href="{{ site.url }}/download">Download</a></li>
-					<li><a href="https://github.com/dawgclan/stac/issues" target="_blank">Bug Reports (GitHub)</a></li>
-					<li><a href="#" target="_blank">Forum Thread (SourceMod)</a></li>
-				</ul>
-			<!-- end .sidebar1 --></div></div>
-			<div style="clear: both;"></div>
+				<div style="clear: both;"></div>
+			</div>
 		</div>
 		<div class="footer">
 			<p>Copyright &copy; 2011 Source Team Attack Control</p>
