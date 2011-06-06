@@ -1,6 +1,7 @@
 ---
 layout: default
 title: STAC 0.5.0 Complete
+author: FlyingMongoose
 ---
 
 The Base to STAC is complete. (0.5.0)
@@ -13,8 +14,8 @@ Here is a list of what has been implemented.
 * Auto-Update Support
 * Logging (for stat-interpretation)
 * Tiered Punishment (X Represents a cvar so if you don't want any kicking to happen, just set to 0, etc.)
-** X Team Attacks = 1 Team Kill
-** X Team Kills = 1 Kick
-** X Kicks = 1 Temp Ban
-** X Bans = Perma-Ban
+*	X Team Attacks = 1 Team Kill
+*	X Team Kills = 1 Kick
+*	X Kicks = 1 Temp Ban
+*	X Bans = Perma-Ban
 * Plugin Natives/Forwards

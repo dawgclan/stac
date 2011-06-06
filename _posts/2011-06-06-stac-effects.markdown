@@ -1,6 +1,7 @@
 ---
 layout: default
 title: STAC Effects Implemented
+author: FlyingMongoose
 ---
 
 One thing that made ATAC, and it's alternatives (such as Rothgar's Simple Anti-TK) unique was the fact that you had "fun" ways of punishing those who wronged you?
