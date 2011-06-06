@@ -42,7 +42,7 @@ a:hover, a:active, a:focus { /* this group of selectors will give a keyboard nav
 .bigcontainer
 {
 	background: #fff;
-	width: 900px;
+	width: 960px;
 	margin: auto;
 }
 /* ~~ this container surrounds all other divs giving them their percentage-based width ~~ */
