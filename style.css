@@ -118,6 +118,7 @@ ul.nav {
 	margin: 0; /* this creates the space between the navigation on the content below */
 }
 ul.nav li {
+	float: left;
 	border-right: 1px solid #666; /* this creates the button separation */
 	display: inline;
 }
