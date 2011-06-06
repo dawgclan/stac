@@ -1,5 +1,11 @@
 "Phrases"
 {
+	"STAC_Merge"
+	{
+		"#format"	"{1:t},{2:t}"
+		"en"		"{1} {2}"
+	}
+
 	"Attacks"
 	{
 		"#format"	"{1:N},{2:i},{3:i}"
