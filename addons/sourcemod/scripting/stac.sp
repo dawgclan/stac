@@ -60,6 +60,9 @@ new bool:g_bKarmaEnabled;
 new bool:g_bKarmaBanRemove;
 new bool:g_bKarmaKickRemove;
 new Function:g_fPunishmentCallbacks[64];
+
+new Handle:arrayPlayerPunishments[MAXPLAYERS + 1] =	{INVALID_HANDLE, ...};
+
 // clientpref handles
 new Handle:g_hAttacks =							INVALID_HANDLE;
 new Handle:g_hBans =							INVALID_HANDLE;
@@ -569,8 +572,53 @@ public Event_PlayerHurt(Handle:event, const String:name[], bool:dontBroadcast)
 public Event_PlayerSpawn(Handle:event, const String:name[], bool:dontBroadcast)
 {
 	new iClient = GetClientOfUserId(GetEventInt(event, "userid"));
-	if(g_hSpawnPunishment[iClient])
-		CreateTimer(g_iSpawnPunishDelay * 1.0, Timer_SpawnPunishment, iClient);
+
+	if (g_bEnabled)
+	{
+		if (iClient > 0)
+		{
+			if (!IsFakeClient(iClient))
+			{
+				if(g_hSpawnPunishment[iClient])
+					CreateTimer(g_iSpawnPunishDelay * 1.0, Timer_SpawnPunishment, iClient);
+
+				//g_Player_MaxHealth[client] = GetClientHealth(client);
+
+				//arrayPlayerSpawnTime[client] = GetTime();
+
+				//SetEntityGravity(client, 1.0);
+
+				// Check Punishment Queue
+				new arrayPunishmentSize = GetArraySize(arrayPlayerPunishments[iClient]);
+
+				// Quick check if array is damaged?
+				if (FloatFraction(arrayPunishmentSize / 2.0) == 0.0)
+				{
+					if (arrayPunishmentSize > 0)
+					{
+						// Array Indexes
+						new arrayVictimIndex = arrayPunishmentSize - 2;
+						new arrayPunishmentIndex = arrayPunishmentSize - 1;
+
+						// Array Values
+						new iVictim = GetArrayCell(arrayPlayerPunishments[iClient],arrayVictimIndex);
+						new iPunishment = GetArrayCell(arrayPlayerPunishments[iClient],arrayPunishmentIndex);
+
+						// Remove Punishment from Array
+						RemoveFromArray(arrayPlayerPunishments[iClient],arrayPunishmentIndex);
+						RemoveFromArray(arrayPlayerPunishments[iClient],arrayVictimIndex);
+
+						// Punish TK'er
+						PunishPlayer(iPunishment, iVictim, iClient);
+					}
+				}
+				else
+				{
+					//LogDebug(false, "Punishment array was damaged? Size: %d", arrayPunishmentSize);
+				}
+			}
+		}
+	}
 }
 
 /**
@@ -929,6 +977,13 @@ PunishPlayer(punishment, victim, attacker)
 	Call_PushCell(victim);
 	Call_PushCell(attacker);
 	Call_Finish();
+}
+
+
+QueuePunishment(punishment, victim, attacker)
+{
+	PushArrayCell(arrayPlayerPunishments[attacker], victim);
+	PushArrayCell(arrayPlayerPunishments[attacker], punishment);
 }
  
 ResetClientPrefs(client)
