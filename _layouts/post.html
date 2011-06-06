@@ -19,8 +19,8 @@ ul.nav a { zoom: 1; }  /* the zoom property gives IE the hasLayout trigger it ne
   <div class="content">
     <h1>Post</h1>
     <div class="main">
-    <h2>{{ page.title }}</h2>
     <div class="post">
+    <h2>{{ page.title }}</h2>
     {{ content }}
     <em style="margin-left: 5px; float: left">Posted on {{ page.date | date_to_long_string }} by <a href="https://github.com/{{ age.author }}" target="_blank">{{ page.author }}</a>.</em>
     <br /><br />
