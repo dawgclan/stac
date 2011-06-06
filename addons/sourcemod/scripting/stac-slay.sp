@@ -40,7 +40,7 @@ public OnLibraryAdded(const String:name[])
 /**
  *	STAC Punishments
  */
-public STACPunishment_Slay(victrim, attacker)
+public STACPunishment_Slay(victim, attacker)
 {
 	PrintToChatAll("%c[STAC]%c %t", CLR_GREEN, CLR_DEFAULT, "Slayed", STAC_GetInfo(attacker, STACInfo_Kills), STAC_GetSetting(STACSetting_KillLimit));
 

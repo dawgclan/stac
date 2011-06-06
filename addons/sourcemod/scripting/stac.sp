@@ -199,7 +199,7 @@ public APLRes:AskPluginLoad2(Handle:myself, bool:late,String:error[],err_max)
 	return APLRes_Success;
 }	
 
-public OnClientDisconnec(client)
+public OnClientDisconnect(client)
 {
 	if(g_hSpawnPunishment[client] != INVALID_HANDLE)
 	{
