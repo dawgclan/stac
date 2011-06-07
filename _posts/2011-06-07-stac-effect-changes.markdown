@@ -73,3 +73,18 @@ Here is the list of series of events
 5. Within the SlayPlayer function we check to see if the allow explode effect boolean is true, if it is, then we go ahead and calle the effect provided to use by stac-explode, if not we just slay using the SourceMod's default slay function.
 
 Obviously a lot of this stuff is very mod/game specific, however this is as generic as I can get it. Each unique punishment will have it's own native no matter what. However, if a punishment is not loaded, you will not be able to use it's defined native.
+
+Another thing you may have noticed was the fact that there is a forward being handled that isn't a common SourceMod handle up there. It is one of THREE forwards actually. Because of the fact the STAC base handles the following events:
+*"player_hurt"*, *"player_death"*, and *"player_spawn"*, it seems redundant to have our OTHER plugins ALSO hook these functions, so why don't we just push them forward? And so we did, which has exposed the following three functions.
+
+	forward STAC_OnPlayerHurt(attacker,victim);
+	forward STAC_OnDeath(attacker,victim);
+	forward STAC_OnPlayerSpawn(client);
+	
+They are pretty self explanatory, and while registering plugins for use in the punishment menu and handling effects if selected is important, what if you want your plugin to just "do something in case someone was punished", well, we took care of that too.
+
+	forward STAC_OnPlayerPunished(punishment,attacker,victim);
+
+The punishment is a string holding the name of the punishment, you know, in case you want it, but you don't have to use it. And the other two are obviously self explanatory.
+
+I'm pretty sure that's covered all the bases so far, more will be posted as more is developed, literally.
