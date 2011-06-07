@@ -919,7 +919,9 @@ CheckInfo(client)
 				STAC_SetInfo(client,	STACInfo_Bans,	iOldBans--);
 				PrintToChat(client, "%c[STAC]%c %t", CLR_GREEN, CLR_DEFAULT, "Now Have Bans",  STAC_GetInfo(client, STACInfo_Bans), g_iBanLimit);
 			}
-			STAC_SetInfo(client,STACInfo_Karma, 0);
+			
+			new iNewKarma = STAC_GetInfo(client,STACInfo_Karma) - g_iKarmaLimit;
+			STAC_SetInfo(client,STACInfo_Karma, iNewKarma);
 		}
 	}
 	if(g_iBanLimit > 0)
