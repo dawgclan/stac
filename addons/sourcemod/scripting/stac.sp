@@ -905,15 +905,14 @@ CheckInfo(client)
 				new iOldKills = STAC_GetInfo(client,	STACInfo_Kills);
 				STAC_SetInfo(client,	STACInfo_Kills,		iOldKills--);
 				PrintToChat(client, "%c[STAC]%c %t", CLR_GREEN, CLR_DEFAULT, "Now Have Kills",  STAC_GetInfo(client, STACInfo_Kills), g_iKillLimit);
-
 			}
-			else if(g_iKickLimit > 0 && g_bKarmaKickRemove)
+			else if(g_iKickLimit > 0 && g_bKarmaKickRemove && !STAC_GetInfo(client,STACInfo_Kills))
 			{
 				new iOldKicks = STAC_GetInfo(client,	STACInfo_Kicks);
 				STAC_SetInfo(client,	STACInfo_Kicks,		iOldKicks--);
 				PrintToChat(client, "%c[STAC]%c %t", CLR_GREEN, CLR_DEFAULT, "Now Have Kicks",  STAC_GetInfo(client, STACInfo_Kicks), g_iKickLimit);
 			}
-			else if(g_iBanLimit > 0 && g_bKarmaBanRemove)
+			else if(g_iBanLimit > 0 && g_bKarmaBanRemove && !STAC_GetInfo(client,STACInfo_Kicks) && !STAC_GetInfo(client,STACInfo_Kills))
 			{
 				new iOldBans = STAC_GetInfo(client,		STACInfo_Bans);
 				STAC_SetInfo(client,	STACInfo_Bans,	iOldBans--);
