@@ -20,6 +20,7 @@ public Plugin:myinfo	=
  *	Globals
  */
 new g_iSpawnTime[MAXPLAYERS + 1];
+new g_iPlayerHealth[MAXPLAYERS + 1];
 new bool:g_bAllowExplodeEffect = false;
 new Handle:g_hBombDefusedKarma;
 new Handle:g_hBombExplodedKarma;
@@ -64,7 +65,6 @@ public OnPluginStart()
 	HookEvent("bomb_exploded",		Event_BombExploded);
 	HookEvent("bomb_planted",		Event_BombPlanted);
 	HookEvent("hostage_rescued",	Event_HostageRescued);
-	HookEvent("player_hurt",		Event_PlayerHurt);
 	HookEvent("round_end",			Event_RoundEnd);
 	
 }
@@ -136,56 +136,56 @@ public Event_HostageRescued(Handle:event, const String:name[], bool:dontBroadcas
 	
 }
 
-public Event_PlayerHurt(Handle:event, const String:name[], bool:dontBroadcast)
+public STAC_OnPlayerHurt(attacker,victim)
 {
-	
-	
-	new iAttacker	=	GetClientOfUserId(GetEventInt(event, "attacker")),
-		iDamage		=	GetEventInt(event, "dmg_health"),
-		iVictim		=	GetClientOfUserId(GetEventInt(event, "userid"));
-		
-	if(!STAC_GetSetting(STACSetting_Enabled) || !iAttacker || iAttacker == iVictim || GetClientTeam(iAttacker) != GetClientTeam(iVictim))
+	if(!STAC_GetSetting(STACSetting_Enabled) || !attacker || attacker == victim || GetClientTeam(attacker) != GetClientTeam(victim))
 		return;
-	
-	if(GetConVarBool(g_hHealDamage))
-		SetEntityHealth(iVictim, GetClientHealth(iVictim) + iDamage);
-	
-	if(GetConVarBool(g_hMirrorDamage))
-	{
-			new iHealth = GetClientHealth(iAttacker);
-			if(iHealth <= 0)
-			{
-				SlayPlayer(iAttacker);
-				return;
-			}
-			if(GetConVarBool(g_hMirrorDamageSlap))
-				SlapPlayer(iAttacker,		iDamage);
-			else
-				SetEntityHealth(iAttacker,	iHealth);
-	}
-	
+		
 	// If Ignoring bots is enabled, and attacker or victim is a bot, ignore
-	if(STAC_GetSetting(STACSetting_IgnoreBots)	&& (IsFakeClient(iAttacker) || IsFakeClient(iVictim)))
+	if(STAC_GetSetting(STACSetting_IgnoreBots)	&& (IsFakeClient(attacker) || IsFakeClient(victim)))
 		return;
 	
 	// If immunity is enabled, and attacker has custom 6 or root flag, ignore
-	if(STAC_GetSetting(STACSetting_Immunity)	&& GetUserFlagBits(iAttacker) & (ADMFLAG_CUSTOM6|ADMFLAG_ROOT))
+	if(STAC_GetSetting(STACSetting_Immunity)	&& GetUserFlagBits(attacker) & (ADMFLAG_CUSTOM6|ADMFLAG_ROOT))
 		return;
+	
+	new iVictimHealth = GetClientHealth(victim);
+	new iDamage = g_iPlayerHealth[victim] - iVictimHealth;
+	
+	if(GetConVarBool(g_hHealDamage))
+		SetEntityHealth(victim, iVictimHealth + iDamage);
+	
+	if(GetConVarBool(g_hMirrorDamage))
+	{
+		new iAttackerHealth = GetClientHealth(attacker);
+		if(iAttackerHealth <= 0)
+		{
+			SlayPlayer(attacker);
+			return;
+		}
+		if(GetConVarBool(g_hMirrorDamageSlap))
+			SlapPlayer(attacker,		iDamage);
+		else
+			SetEntityHealth(attacker,	iVictimHealth);
+	}
 	
 	// If spawn protection is disabled, or the spawn protection has expired, ignore
 	new iProtectTime = GetConVarInt(g_hSpawnProtectTime);
-	if(!iProtectTime || GetTime() - g_iSpawnTime[iVictim] > iProtectTime)
+	if(!iProtectTime || GetTime() - g_iSpawnTime[victim] > iProtectTime)
 		return;
 	
-	PrintToChatAll("%c[STAC]%c %t", CLR_GREEN, CLR_DEFAULT, "Spawn Attacking", iAttacker, iVictim);
-	SlayPlayer(iAttacker);
+	PrintToChatAll("%c[STAC]%c %t", CLR_GREEN, CLR_DEFAULT, "Spawn Attacking", attacker, victim);
+	SlayPlayer(attacker);
+	
 }
+
 
 public STAC_OnPlayerSpawn(client)
 {
 	if(!STAC_GetSetting(STACSetting_Enabled))
 		return;
 	
+	GetClientHealth(g_iPlayerHealth[client]);
 	g_iSpawnTime[client] = GetTime();
 }
 

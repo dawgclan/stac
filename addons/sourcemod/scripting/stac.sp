@@ -95,6 +95,7 @@ new Mod:g_iMod = Mod_Default;
 // Foward handles
 new Handle:g_hOnPlayerDeath;
 new Handle:g_hOnPlayerHurt;
+new Handle:g_hOnPlayerPunished;
 new Handle:g_hOnPlayerSpawn;
 
 // Log File Functions
@@ -198,7 +199,7 @@ public APLRes:AskPluginLoad2(Handle:myself, bool:late,String:error[],err_max)
 	CreateNative("STAC_GetSetting",			Native_GetSetting);
 	CreateNative("STAC_RegisterPunishment",	Native_RegisterPunishment);
 	CreateNative("STAC_Setinfo",			Native_SetInfo);
-	CreateNative("STAC_PrintAll",		Native_PrintAll);
+	CreateNative("STAC_PrintAll",			Native_PrintAll);
 	
 	return APLRes_Success;
 }	
@@ -1040,6 +1041,11 @@ PunishPlayer(punishment, victim, attacker)
 	Call_PushCell(victim);
 	Call_PushCell(attacker);
 	Call_Finish();
+	Call_StartForward(g_hOnPlayerPunished);
+	Call_PushCell(punishment);
+	Call_PushCell(attacker);
+	Call_PushCell(victim);
+	Call_Finish();
 }
 
 
@@ -1063,7 +1069,8 @@ ResetClientPrefs(client)
 
 CreateForwards()
 {
-	g_hOnPlayerDeath		= 	CreateGlobalForward("STAC_OnPlayerDeath",ET_Ignore,Param_Cell);
-	g_hOnPlayerHurt			=	CreateGlobalForward("STAC_OnPlayerHurt",ET_Ignore,Param_Cell);
-	g_hOnPlayerSpawn		=	CreateGlobalForward("STAC_OnPlayerSpawn",ET_Ignore,Param_Cell);
+	g_hOnPlayerDeath		= 	CreateGlobalForward("STAC_OnPlayerDeath",		ET_Ignore,Param_Cell);
+	g_hOnPlayerHurt			=	CreateGlobalForward("STAC_OnPlayerHurt",		ET_Ignore,Param_Cell);
+	g_hOnPlayerPunished		=	CreateGlobalForward("STAC_OnPlayerPunished",	ET_Ignore,Param_Cell);
+	g_hOnPlayerSpawn		=	CreateGlobalForward("STAC_OnPlayerSpawn",		ET_Ignore,Param_Cell);
 }

@@ -12,7 +12,7 @@
 #define STAC_AUTHORS	"Rothgar, Tsunami, FlyingMongoose"
 #define STAC_WEBSITE	"http://dawgclan.github.com/stac"
 
-functag public STAC_Effect(Handle:plugin, numParams);
+//functag public STAC_Effect(Handle:plugin, numParams);
 
 /**
  * Executes a beacon on the client

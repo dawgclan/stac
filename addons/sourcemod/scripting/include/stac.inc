@@ -94,6 +94,12 @@ forward STAC_OnPlayerDeath(attacker,victim);
 forward STAC_OnPlayerHurt(attacker,victim);
 
 /**
+ * When a player is punished
+ *
+ */
+forward STAC_OnPlayerPunished(punishment,attacker,victim);
+
+/**
  * When a player spawns
  *
  */
