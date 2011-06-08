@@ -1,0 +1,18 @@
+"Phrases"
+{
+	"Capturing Point"
+	{
+		"en"		"capturing a point."
+	}
+	"Spawn Attacking"
+	{
+		"#format"	"{1:N},{2:N}"
+		"en"		"{1} has been slayed for spawn attacking {2}."
+		"de"		"{1} wurde erschlagen wegen Spawnattacke an {2}."
+		"fr"		"{1} a t tu(e) massacre au spawn sur {2}."
+	}
+	"Winning Round"
+	{
+		"en"		"winning the round."
+	}
+}
