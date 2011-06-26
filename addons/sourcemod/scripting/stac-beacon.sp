@@ -26,7 +26,9 @@ public OnPluginStart()
 {
 	// Load Translations
 	LoadTranslations("stac-beacon.phrases");
+#if defined _stac_included_
 	LoadTranslations("stac.phrases");
+#endif
 
 #if defined _stac_included_
 	if(LibraryExists("stac"))
