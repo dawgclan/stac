@@ -1,12 +1,11 @@
 #pragma semicolon 1
 
-
 #include <sourcemod>
 #include <sdktools>
 
 #undef REQUIRE_PLUGIN
 #tryinclude <stac>
-#tryinclude <stac-effect>
+#tryinclude <stac_effect>
 
 new Handle:g_hBeacon =			INVALID_HANDLE;
 new Handle:g_hBeaconRadius =	INVALID_HANDLE;
@@ -27,6 +26,7 @@ public OnPluginStart()
 {
 	// Load Translations
 	LoadTranslations("stac-beacon.phrases");
+	LoadTranslations("stac.phrases");
 
 #if defined _stac_included_
 	if(LibraryExists("stac"))
@@ -176,9 +176,20 @@ public Action:Timer_Beacon(Handle:timer, any:value)
  *	STAC Punishment
  */
 
-public STACPunishment_Beacon(victim, attacker)
+public STACPunishment_Beacon(victim, attacker, bool:TeamAttack)
 {
-	PrintToChatAll("%c[STAC]%c %t", CLR_GREEN, CLR_DEFAULT, "Beaconed", STAC_GetInfo(attacker, STACInfo_Kills), STAC_GetSetting(STACSetting_KillLimit));
+#if defined _stac_included_
+	if (TeamAttack)
+	{
+		PrintToChatAll("%c[STAC]%c %t", CLR_GREEN, CLR_DEFAULT, "Merge", "Beaconed", attacker, "Attacks", attacker, STAC_GetInfo(attacker, STACInfo_Kills), STAC_GetSetting(STACSetting_KillLimit));
+	}
+	else
+	{
+		PrintToChatAll("%c[STAC]%c %t", CLR_GREEN, CLR_DEFAULT, "Merge", "Beaconed", attacker, "Kills", STAC_GetInfo(attacker, STACInfo_Kills), STAC_GetSetting(STACSetting_KillLimit));
+	}
+#else
+	PrintToChatAll("%c[STAC]%c %t", CLR_GREEN, CLR_DEFAULT, "Beaconed", attacker);
+#endif
 
 	if (g_BeaconSerial[attacker] == 0)
 	{
