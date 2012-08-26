@@ -54,8 +54,7 @@ a:hover, a:active, a:focus { /* this group of selectors will give a keyboard nav
 	background: #FFF;
 	margin: 0 auto; /* the auto value on the sides, coupled with the width, centers the layout. It is not needed if you set the .container's width to 100%. */
 	
-	border-top: 1px;
-	border-color: #666;
+	border-top: 1px solid #666;
 }
 
 /* ~~ the header is not given a width. It will extend the full width of your layout. It contains an image placeholder that should be replaced with your own linked logo ~~ */
