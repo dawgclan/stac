@@ -14,7 +14,7 @@ title: News
 {% endfor %}
 
 <!-- Pagination links -->
-<div class="pagination">
+<nav class="pagination">
   {% if paginator.previous_page %}
     {% if paginator.previous_page == 1 %}
       <a href="{{ site.url }}" title="Previous Page">&laquo; Newer</a>
@@ -27,4 +27,4 @@ title: News
   {% if paginator.next_page %}
     <a href="{{ site.url }}/page{{paginator.next_page}}/" class="next ">Older &raquo;</a>
   {% endif %}
-</div>
+</nav>
