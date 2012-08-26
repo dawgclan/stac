@@ -15,6 +15,19 @@ public Plugin:myInfo =
 	url			= STAC_WEBSITE
 };
 
+
+/**
+*	Globals
+*/
+enum Mod
+{
+	Mod_Default,
+	Mod_Insurgency,
+	Mod_ZPS
+}
+
+new Mod:g_iMod = Mod_Default;
+
 /**
  *	Plugin Forwards
  */
@@ -25,6 +38,25 @@ public OnPluginStart()
 	
 	if(LibraryExists("stac"))
 		OnLibraryAdded("stac");
+
+	
+	// Store Mod
+	decl String:sBuffer[65];
+	GetGameFolderName(sBuffer, sizeof(sBuffer));
+	if (StrContains(sBuffer, "insurgency", false) != -1 )
+	{
+		g_iMod = Mod_Insurgency;
+	}
+	else if (strcmp(sBuffer, "ZPS", false) == 0)
+	{
+		g_iMod = Mod_ZPS;
+	}
+	else
+	{
+		GetGameDescription(sBuffer,	sizeof(sBuffer));
+		if(StrContains(sBuffer, "Insurgency", false) != -1)
+			g_iMod = Mod_Insurgency;
+	}
 }
 
 public OnLibraryAdded(const String:name[])

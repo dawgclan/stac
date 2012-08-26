@@ -387,9 +387,24 @@ public OnClientCookiesCached(client)
 	
 	SortIntegers(iStorageTimes,5,Sort_Descending);
 	
-	new iTimeDifference = iCurrentTime - iStorageTimes[0];
-	if(iTimeDifference > (GetConVarFloat(g_hPurgeTime) * 60))
-		ResetClientPrefs(client);
+	new iTimeDifference[5];
+	iTimeDifference[0] = iCurrentTime - iStorageTimes[0];
+	iTimeDifference[1] = iCurrentTime - iStorageTimes[1];
+	iTimeDifference[2] = iCurrentTime - iStorageTimes[2];
+	iTimeDifference[3] = iCurrentTime - iStorageTimes[3];
+	iTimeDifference[4] = iCurrentTime - iStorageTimes[4];
+	
+	new iPurgeTime = (GetConVarInt(g_hPurgeTime) * 60);
+	if(iTimeDifference[0] > iPurgeTime)
+		SetClientCookie(client,	g_hAttacks,	"0");
+	if(iTimeDifference[1] > iPurgeTime)
+		SetClientCookie(client,	g_hBans,	"0");
+	if(iTimeDifference[2] > iPurgeTime)
+		SetClientCookie(client,	g_hKarma,	"0");
+	if(iTimeDifference[3] > iPurgeTime)
+		SetClientCookie(client,	g_hKicks,	"0");
+	if(iTimeDifference[4] > iPurgeTime)
+		SetClientCookie(client,	g_hKills,	"0");
 }
 
 public ConVarChange_ConVars(Handle:convar, const String:oldValue[], const String:newValue[])

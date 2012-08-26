@@ -46,8 +46,8 @@ public OnPluginStart()
 	
 	decl String:sGameDir[64];
 	GetGameFolderName(sGameDir,sizeof(sGameDir));
-	if(!StrEqual(sGameDir, "cstrike"))
-		SetFailState("This plugin will only work for Counter-Strike: Source.");
+	if(!StrEqual(sGameDir, "cstrike") || !StrEqual("sGameDir", "csgo"))
+		SetFailState("This plugin will only work for Counter-Strike: Source or Global Offensive.");
 	
 	// Create Convars
 	g_hBombDefusedKarma		=	CreateConVar("stac_bombdefused_karma",		"3",	"STAC Bomb Defused Karma",		FCVAR_PLUGIN);
@@ -164,9 +164,9 @@ public STAC_OnPlayerHurt(attacker,victim)
 			return;
 		}
 		if(GetConVarBool(g_hMirrorDamageSlap))
-			SlapPlayer(attacker,		iDamage);
+			SlapPlayer(attacker,iDamage);
 		else
-			SetEntityHealth(attacker,	iVictimHealth);
+			SetEntityHealth(attacker,iVictimHealth);
 	}
 	
 	// If spawn protection is disabled, or the spawn protection has expired, ignore

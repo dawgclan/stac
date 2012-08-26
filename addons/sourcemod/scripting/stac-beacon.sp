@@ -48,6 +48,8 @@ public OnLibraryAdded(const String:name[])
 	decl String:sName[32];
 	Format(sName, sizeof(sName), "%T", "Beacon", LANG_SERVER);
 	STAC_RegisterPunishment(sName, STACPunishment_Beacon);
+	
+	STAC_RegisterPunishment(sName, STACPunishment_Beacon);
 }
 #endif
 
